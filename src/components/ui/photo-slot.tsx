@@ -32,11 +32,21 @@ export function PhotoSlot({
   alt,
   className,
   gradient = "from-primary-700 via-primary-800 to-ink-900",
+  // Defaults to the old blanket "100vw" for any call site that doesn't pass
+  // one — but that means Next.js requests a viewport-width image for even a
+  // 64px avatar circle. Pass the actual rendered width (e.g. "192px", or a
+  // media-query string) wherever a photo isn't genuinely full-bleed, so the
+  // generated srcset — and what actually gets downloaded — matches what's on
+  // screen instead of over-fetching by 3-5x.
+  sizes = "100vw",
+  priority,
 }: {
   src?: string;
   alt: string;
   className?: string;
   gradient?: string;
+  sizes?: string;
+  priority?: boolean;
 }) {
   if (src) {
     const workaround = needsReferrerWorkaround(src);
@@ -46,7 +56,8 @@ export function PhotoSlot({
         alt={alt}
         fill
         className={cn("object-cover", className)}
-        sizes="100vw"
+        sizes={sizes}
+        priority={priority}
         unoptimized={workaround}
         referrerPolicy={workaround ? "no-referrer" : undefined}
       />

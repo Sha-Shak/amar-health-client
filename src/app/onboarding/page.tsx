@@ -42,7 +42,7 @@ export default function OnboardingPage() {
 
   return (
     <div className="relative flex-1 overflow-hidden">
-      <PhotoSlot alt="" src={panel.src} gradient={panel.gradient} />
+      <PhotoSlot alt="" src={panel.src} gradient={panel.gradient} priority />
       <div className="photo-scrim absolute inset-0" />
 
       <button

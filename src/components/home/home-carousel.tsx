@@ -35,8 +35,19 @@ export function HomeCarousel({
       href={slide.href}
       className="relative mb-6 block h-56 overflow-hidden rounded-[var(--radius-card)]"
     >
-      <PhotoSlot alt="" src={slide.photo} gradient="from-primary-700 to-ink-900" />
-      <div className="glass-on-photo absolute inset-0 flex flex-col justify-end gap-2 rounded-[var(--radius-card)] p-5">
+      {/* This card caps out at max-w-sm (384px) — never truly viewport-width —
+          and it's always the first thing rendered on Home, so it's also worth
+          loading eagerly rather than waiting on the lazy-load threshold. */}
+      <PhotoSlot alt="" src={slide.photo} gradient="from-primary-700 to-ink-900" sizes="384px" priority />
+      {/* Plain gradient scrim, not backdrop-filter — see feature-tile.tsx's
+          comment: backdrop-filter inside an overflow-hidden rounded card is
+          known to render far too strongly on iOS Safari, to the point of
+          hiding the photo underneath entirely. */}
+      <div className="photo-scrim absolute inset-0 rounded-[var(--radius-card)]" />
+      <div
+        className="absolute inset-0 flex flex-col justify-end gap-2 p-5 text-white"
+        style={{ filter: "drop-shadow(0 1px 4px rgb(0 0 0 / 0.55))" }}
+      >
         <p className="text-lg font-semibold">{slide.title}</p>
         <p className="text-sm text-white/85">{slide.body}</p>
         <div className="flex justify-center gap-1 pt-1">

@@ -57,8 +57,12 @@ export default function FamilyPage() {
       <div className="mx-auto flex w-full max-w-sm flex-1 flex-col px-5 pt-8">
         <h1 className="mb-4 text-2xl font-bold">Family</h1>
         <div className="relative h-48 overflow-hidden rounded-[var(--radius-card)]">
-          <PhotoSlot alt="" src={photos.tiles.family} />
-          <div className="glass-on-photo absolute inset-0 flex flex-col justify-end p-4">
+          <PhotoSlot alt="" src={photos.tiles.family} sizes="384px" />
+          <div className="photo-scrim absolute inset-0 rounded-[var(--radius-card)]" />
+          <div
+            className="absolute inset-0 flex flex-col justify-end p-4 text-white"
+            style={{ filter: "drop-shadow(0 1px 4px rgb(0 0 0 / 0.55))" }}
+          >
             <Users size={28} strokeWidth={1.6} className="mb-2" aria-hidden="true" />
             <p className="font-semibold">Keep your family&apos;s health organized together</p>
           </div>
