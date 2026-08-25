@@ -8,10 +8,12 @@ import { useMutation } from "@tanstack/react-query";
 import { Mail, Phone } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useState } from "react";
 
 export default function LoginChooseMethodPage() {
   const router = useRouter();
   const { applyAuthResult } = useAuth();
+  const [googleLoadError, setGoogleLoadError] = useState<string | null>(null);
 
   const googleMutation = useMutation({
     mutationFn: (idToken: string) => authApi.googleAuth(idToken),
@@ -31,8 +33,11 @@ export default function LoginChooseMethodPage() {
       <div className="space-y-3">
         <GoogleSignInButton
           onCredential={(idToken) => googleMutation.mutate(idToken)}
-          onError={() => {}}
+          onError={setGoogleLoadError}
         />
+        {googleLoadError && (
+          <p className="text-center text-sm text-coral-600">{googleLoadError}</p>
+        )}
         {googleMutation.isError && (
           <p className="text-center text-sm text-coral-600">
             {errorMessage(googleMutation.error)}

@@ -56,7 +56,7 @@ export default function EditProfilePage() {
       }
       return authApi.updateMe({
         name,
-        dob,
+        ...(dob ? { dob } : {}),
         ...(gender ? { gender } : {}),
         bloodGroup: bloodGroup || "unknown",
         nid,

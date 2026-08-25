@@ -17,6 +17,14 @@ const MESSAGES: Record<string, string> = {
   TARGET_ALREADY_IN_GROUP: "This person already belongs to another family group.",
   INVITATION_NOT_FOUND: "This invitation is invalid or has expired.",
   NOT_YOUR_INVITATION: "This invitation was sent to a different account.",
+  REQUEST_NOT_FOUND: "This blood request no longer exists.",
+  NOT_REQUEST_OWNER: "Only the person who posted this request can do that.",
+  CANNOT_RESPOND_TO_OWN_REQUEST: "You can't respond to your own request.",
+  DONOR_NOT_FOUND: "No account found for that patient code — double-check it.",
+  CANNOT_CONFIRM_SELF: "You can't confirm yourself as the donor.",
+  // DONATION_GAP_NOT_MET deliberately omitted — the backend's own message
+  // already includes the exact eligible-again date, which is more useful
+  // than any fixed string here (see errorMessage()'s fallback to err.message).
 };
 
 export function errorMessage(err: unknown): string {

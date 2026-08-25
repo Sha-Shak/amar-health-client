@@ -3,11 +3,12 @@
 import { useAuth } from "@/components/providers/auth-provider";
 import { FeatureTile } from "@/components/home/feature-tile";
 import { HomeCarousel } from "@/components/home/home-carousel";
+import { WideTile } from "@/components/home/wide-tile";
 import { photos } from "@/config/photos";
 import { homeApi } from "@/features/home/api";
 import { remindersApi } from "@/features/reminders/api";
 import { useQuery } from "@tanstack/react-query";
-import { Bell, Building2, FlaskConical, FolderHeart, Pill, Stethoscope, Users } from "lucide-react";
+import { Bell, Building2, Droplets, FlaskConical, FolderHeart, Pill, Stethoscope, Users } from "lucide-react";
 import Link from "next/link";
 
 export default function HomeDashboardPage() {
@@ -88,6 +89,15 @@ export default function HomeDashboardPage() {
         <FeatureTile href="/tests" label="Tests" icon={FlaskConical} photo={photos.tiles.tests} />
         <FeatureTile href="/hospitals" label="Hospitals" icon={Building2} photo={photos.tiles.hospitals} />
         <FeatureTile href="/family" label="Family" icon={Users} photo={photos.tiles.family} />
+      </div>
+
+      <div className="mt-3">
+        <WideTile
+          href="/blood-donation"
+          label="Blood Donation"
+          description="Find or offer blood in your community"
+          icon={Droplets}
+        />
       </div>
 
       {vaultSummary && vaultTotal !== undefined && vaultTotal > 0 && (

@@ -2,8 +2,8 @@
 
 import { FilterChips } from "@/components/search/filter-chips";
 import { SearchBar } from "@/components/search/search-bar";
+import { HospitalPlaceholder } from "@/components/ui/hospital-placeholder";
 import { PhotoSlot } from "@/components/ui/photo-slot";
-import { photos } from "@/config/photos";
 import { directoryApi } from "@/features/directory/api";
 import { HOSPITAL_TYPES, hospitalTypeLabel, type HospitalType } from "@/features/directory/types";
 import { useDebouncedValue } from "@/lib/use-debounced-value";
@@ -55,7 +55,7 @@ export default function HospitalsPage() {
             className="glass-panel flex gap-3 p-3"
           >
             <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-[var(--radius-sm)]">
-              <PhotoSlot alt="" src={hospital.photoUrl || photos.tiles.hospitals} gradient="from-coral-600 to-ink-900" />
+              {hospital.photoUrl ? <PhotoSlot alt="" src={hospital.photoUrl} /> : <HospitalPlaceholder />}
             </div>
             <div className="min-w-0 flex-1 py-0.5">
               <p className="truncate font-semibold">{hospital.name}</p>
