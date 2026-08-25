@@ -52,7 +52,7 @@ export function DoctorAutocomplete({
         onBlur={() => setTimeout(() => setIsOpen(false), 150)}
         placeholder="Search by name…"
         autoComplete="off"
-        className="w-full rounded-[var(--radius-sm)] border border-black/5 bg-surface-70 px-4 py-3 text-ink-900 placeholder:text-ink-500 outline-none transition-shadow focus:border-primary-600/40 focus:ring-2 focus:ring-primary-600/30"
+        className="w-full rounded-[var(--radius-sm)] border border-primary-400/30 bg-surface-70 px-4 py-3 text-ink-900 placeholder:text-ink-500 outline-none transition-shadow focus:border-primary-600/40 focus:ring-2 focus:ring-primary-600/30"
       />
       {doctorId && (
         <p className="text-xs text-primary-700">Linked to a doctor in our directory</p>

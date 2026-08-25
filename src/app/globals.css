@@ -56,8 +56,13 @@
     background: color-mix(in oklab, rgb(var(--surface-color)) 72%, transparent);
     backdrop-filter: blur(20px) saturate(1.4);
     -webkit-backdrop-filter: blur(20px) saturate(1.4);
-    border: 1px solid color-mix(in oklab, rgb(var(--surface-color)) 60%, transparent);
-    border-top-color: color-mix(in oklab, rgb(var(--surface-color)) 85%, transparent);
+    /* A soft teal-tinted edge, not a surface-toned one — mixing the border
+       color from --surface-color made it nearly identical to the fill
+       itself, so cards (especially forms) had no visible outline at all.
+       primary-400 doesn't change between themes, so this reads as a light
+       teal line in both light and dark mode without needing an override. */
+    border: 1px solid color-mix(in oklab, var(--color-primary-400) 35%, transparent);
+    border-top-color: color-mix(in oklab, var(--color-primary-200) 55%, transparent);
     box-shadow:
       0 1px 0 0 color-mix(in oklab, rgb(var(--surface-color)) 90%, transparent) inset,
       0 18px 40px -12px color-mix(in oklab, rgb(var(--shadow-color)) 18%, transparent);
@@ -134,12 +139,35 @@
     background: color-mix(in oklab, rgb(var(--surface-color)) 82%, transparent);
     backdrop-filter: blur(28px) saturate(1.6);
     -webkit-backdrop-filter: blur(28px) saturate(1.6);
-    border: 1px solid color-mix(in oklab, rgb(var(--surface-color)) 70%, transparent);
-    border-top-color: color-mix(in oklab, rgb(var(--surface-color)) 92%, transparent);
+    border: 1px solid color-mix(in oklab, var(--color-primary-400) 30%, transparent);
+    border-top-color: color-mix(in oklab, var(--color-primary-200) 50%, transparent);
     box-shadow:
       0 1px 0 0 color-mix(in oklab, rgb(var(--surface-color)) 95%, transparent) inset,
       0 24px 56px -14px color-mix(in oklab, rgb(var(--shadow-color)) 28%, transparent);
     border-radius: var(--radius-card);
+  }
+
+  /* Splash screen background — a real brand gradient (teal → white) in light
+     mode, distinct from the very subtle page-background tint elsewhere, so
+     the launch moment reads as branded rather than blank. Dark mode keeps
+     the app's usual near-black gradient instead of the teal one — a bright
+     teal wash would clash with everything else being dark. */
+  .splash-bg {
+    background: linear-gradient(
+      160deg,
+      var(--color-primary-500) 0%,
+      var(--color-primary-100) 48%,
+      #ffffff 88%
+    );
+  }
+
+  :root[data-theme="dark"] .splash-bg {
+    background: linear-gradient(
+      160deg,
+      var(--page-bg-from) 0%,
+      var(--page-bg-via) 55%,
+      var(--page-bg-to) 100%
+    );
   }
 
   .glass-on-photo {

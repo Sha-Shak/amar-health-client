@@ -38,9 +38,8 @@ export function SplashScreen() {
   return (
     <div
       aria-hidden="true"
-      className="fixed inset-0 z-[100] flex flex-col items-center justify-center gap-4"
+      className="splash-bg fixed inset-0 z-[100] flex flex-col items-center justify-center gap-4"
       style={{
-        background: `linear-gradient(to top left, var(--page-bg-from) 0%, var(--page-bg-via) 55%, var(--page-bg-to) 100%)`,
         opacity: fading ? 0 : 1,
         transition: `opacity ${FADE_MS}ms ease-out`,
         pointerEvents: fading ? "none" : "auto",
