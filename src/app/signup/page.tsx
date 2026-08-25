@@ -52,7 +52,7 @@ export default function ChooseMethodPage() {
 
         <Link
           href="/signup/phone"
-          className="glass-panel tap-target flex items-center gap-4 px-5 py-4"
+          className="glass-panel tap-target flex items-center justify-start gap-4 px-5 py-4"
         >
           <span className="tap-target rounded-full bg-primary-50 text-primary-700">
             <Phone size={20} aria-hidden="true" />
@@ -65,7 +65,7 @@ export default function ChooseMethodPage() {
 
         <Link
           href="/signup/email"
-          className="glass-panel tap-target flex items-center gap-4 px-5 py-4"
+          className="glass-panel tap-target flex items-center justify-start gap-4 px-5 py-4"
         >
           <span className="tap-target rounded-full bg-primary-50 text-primary-700">
             <Mail size={20} aria-hidden="true" />

@@ -3,8 +3,10 @@
 import { PhotoSlot } from "@/components/ui/photo-slot";
 import { AvatarPlaceholder } from "@/components/ui/avatar-placeholder";
 import { Button } from "@/components/ui/button";
+import { LocationMap } from "@/components/ui/location-map-dynamic";
 import { directoryApi } from "@/features/directory/api";
 import { mapsLinkFor, specialtyLabel, type Chamber } from "@/features/directory/types";
+import { geocodeAddress } from "@/lib/geocode";
 import { useQuery } from "@tanstack/react-query";
 import {
   Award,
@@ -31,11 +33,36 @@ export default function DoctorDetailPage() {
     queryFn: () => directoryApi.getDoctor(id),
   });
 
+  // One chamber = one pin. Chambers rarely have real lat/lng (same bulk-import
+  // gap as hospitals), so this resolves each one in parallel via the same
+  // geocoding fallback the hospital detail page uses — parallel across
+  // chambers, not chained, so a doctor with 4 chambers still resolves in
+  // roughly one round-trip's worth of time, not four.
+  const markersQuery = useQuery({
+    queryKey: ["doctors", "chamber-markers", id, data?.chambers.map((c) => c._id).join(",")],
+    queryFn: async () => {
+      const chambers = data!.chambers;
+      const resolved = await Promise.all(
+        chambers.map(async (chamber) => {
+          const coords = chamber.location?.coordinates;
+          const point = coords
+            ? { lat: coords[1], lng: coords[0] }
+            : await geocodeAddress(`${chamber.name}, ${chamber.address}`);
+          return point ? { ...point, label: chamber.name } : null;
+        })
+      );
+      return resolved.filter((m): m is NonNullable<typeof m> => m !== null);
+    },
+    enabled: Boolean(data && data.chambers.length > 0),
+    staleTime: Infinity,
+  });
+
   if (isLoading || !data) {
     return <div className="flex flex-1 items-center justify-center text-ink-700">Loading…</div>;
   }
 
   const { doctor, chambers } = data;
+  const chamberMarkers = markersQuery.data ?? [];
 
   return (
     <div className="flex flex-1 flex-col pb-28">
@@ -92,6 +119,12 @@ export default function DoctorDetailPage() {
             <ChamberCard key={chamber._id} chamber={chamber} />
           ))}
         </div>
+
+        {chamberMarkers.length > 0 && (
+          <div className="mt-4 h-48 overflow-hidden rounded-[var(--radius-card)]">
+            <LocationMap markers={chamberMarkers} className="h-full w-full" />
+          </div>
+        )}
 
         <InfoList icon={Sparkles} title="Areas of expertise" items={doctor.expertise} />
         <InfoList icon={Briefcase} title="Work experience" items={doctor.workExperience} />

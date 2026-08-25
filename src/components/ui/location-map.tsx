@@ -17,22 +17,36 @@ const markerIcon = L.icon({
   shadowSize: [41, 41],
 });
 
+export type MapMarker = { lat: number; lng: number; label: string };
+
 export function LocationMap({
-  lat,
-  lng,
-  label,
+  markers,
   className,
 }: {
-  lat: number;
-  lng: number;
-  label: string;
+  markers: MapMarker[];
   className?: string;
 }) {
+  if (markers.length === 0) return null;
+
+  // A single marker gets a fixed, tight zoom — appropriate for "here's the
+  // one address". Multiple markers can be spread across different cities
+  // (a doctor's chambers, say), so a fixed center+zoom risked leaving some
+  // pins off-screen entirely; `bounds` instead fits the viewport to whatever
+  // box actually contains all of them.
+  const single = markers.length === 1;
+  const bounds: [[number, number], [number, number]] | undefined = single
+    ? undefined
+    : [
+        [Math.min(...markers.map((m) => m.lat)), Math.min(...markers.map((m) => m.lng))],
+        [Math.max(...markers.map((m) => m.lat)), Math.max(...markers.map((m) => m.lng))],
+      ];
+
   return (
     <div className={className}>
       <MapContainer
-        center={[lat, lng]}
-        zoom={15}
+        {...(single
+          ? { center: [markers[0].lat, markers[0].lng] as [number, number], zoom: 15 }
+          : { bounds, boundsOptions: { padding: [24, 24] } })}
         scrollWheelZoom={false}
         className="h-full w-full"
         attributionControl={false}
@@ -41,9 +55,11 @@ export function LocationMap({
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           attribution='&copy; OpenStreetMap contributors'
         />
-        <Marker position={[lat, lng]} icon={markerIcon}>
-          <Popup>{label}</Popup>
-        </Marker>
+        {markers.map((marker, i) => (
+          <Marker key={i} position={[marker.lat, marker.lng]} icon={markerIcon}>
+            <Popup>{marker.label}</Popup>
+          </Marker>
+        ))}
       </MapContainer>
     </div>
   );

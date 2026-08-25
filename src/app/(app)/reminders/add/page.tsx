@@ -120,7 +120,7 @@ export default function AddReminderPage() {
               key={opt.value}
               type="button"
               onClick={() => setType(opt.value)}
-              className="glass-panel tap-target flex w-full items-center gap-4 px-5 py-4 text-left"
+              className="glass-panel tap-target flex w-full items-center justify-start gap-4 px-5 py-4 text-left"
             >
               <span className="tap-target rounded-full bg-primary-50 text-primary-700">
                 <opt.icon size={20} aria-hidden="true" />

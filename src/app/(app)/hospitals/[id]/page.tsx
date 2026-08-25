@@ -101,7 +101,7 @@ export default function HospitalDetailPage() {
 
         {coords && (
           <div className="mt-6 h-48 overflow-hidden rounded-[var(--radius-card)]">
-            <LocationMap lat={coords.lat} lng={coords.lng} label={hospital.name} className="h-full w-full" />
+            <LocationMap markers={[{ ...coords, label: hospital.name }]} className="h-full w-full" />
           </div>
         )}
 
