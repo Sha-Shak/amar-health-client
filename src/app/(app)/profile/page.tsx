@@ -2,11 +2,14 @@
 
 import { AvatarPlaceholder } from "@/components/ui/avatar-placeholder";
 import { SettingsRow } from "@/components/settings/settings-row";
+import { Switch } from "@/components/ui/switch";
 import { useAuth } from "@/components/providers/auth-provider";
+import { useTheme } from "@/components/providers/theme-provider";
 import {
   Bell,
   Download,
   LogOut,
+  Moon,
   ShieldAlert,
   Trash2,
   User as UserIcon,
@@ -16,6 +19,7 @@ import { useRouter } from "next/navigation";
 export default function ProfilePage() {
   const router = useRouter();
   const { user, logout } = useAuth();
+  const { theme, toggleTheme } = useTheme();
   if (!user) return null;
 
   return (
@@ -44,6 +48,17 @@ export default function ProfilePage() {
         <div className="glass-panel divide-y divide-black/5">
           <SettingsRow href="/profile/edit" icon={UserIcon} label="Edit profile" />
           <SettingsRow href="/profile/notifications" icon={Bell} label="Notifications" />
+        </div>
+      </div>
+
+      <div>
+        <p className="mb-2 px-1 text-sm font-medium text-ink-500">Appearance</p>
+        <div className="glass-panel flex items-center gap-3 px-4 py-3.5">
+          <span className="tap-target rounded-full bg-primary-50 text-primary-700">
+            <Moon size={18} aria-hidden="true" />
+          </span>
+          <span className="flex-1 font-medium text-ink-900">Dark mode</span>
+          <Switch checked={theme === "dark"} onChange={toggleTheme} label="Dark mode" />
         </div>
       </div>
 

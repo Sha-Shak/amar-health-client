@@ -81,17 +81,7 @@ export default function HomeDashboardPage() {
         <HomeCarousel todayReminders={reminders} upcomingReminders={upcomingReminders} />
       )}
 
-      <h2 className="mb-3 text-lg font-semibold">Explore</h2>
-      <div className="grid grid-cols-2 gap-3">
-        <FeatureTile href="/vault" label="Vault" icon={FolderHeart} photo={photos.tiles.vault} />
-        <FeatureTile href="/find-care" label="Find Care" icon={Stethoscope} photo={photos.tiles.findCare} />
-        <FeatureTile href="/medicine" label="Medicine" icon={Pill} photo={photos.tiles.medicine} />
-        <FeatureTile href="/tests" label="Tests" icon={FlaskConical} photo={photos.tiles.tests} />
-        <FeatureTile href="/hospitals" label="Hospitals" icon={Building2} photo={photos.tiles.hospitals} />
-        <FeatureTile href="/family" label="Family" icon={Users} photo={photos.tiles.family} />
-      </div>
-
-      <div className="mt-3">
+      <div className="mb-3">
         <WideTile
           href="/blood-donation"
           label="Blood Donation"
@@ -102,14 +92,24 @@ export default function HomeDashboardPage() {
 
       {vaultSummary && vaultTotal !== undefined && vaultTotal > 0 && (
         <>
-          <h2 className="mb-3 mt-6 text-lg font-semibold">Your vault</h2>
-          <div className="glass-panel flex items-center justify-around p-4 text-center">
+          <h2 className="mb-3 text-lg font-semibold">Your vault</h2>
+          <div className="glass-panel mb-6 flex items-center justify-around p-4 text-center">
             <VaultStat href="/vault/folder/prescription" label="Prescriptions" count={vaultSummary.prescriptionCount} />
             <VaultStat href="/vault/folder/report" label="Reports" count={vaultSummary.reportCount} />
             <VaultStat href="/vault/folder/bill" label="Bills" count={vaultSummary.billCount} />
           </div>
         </>
       )}
+
+      <h2 className="mb-3 text-lg font-semibold">Explore</h2>
+      <div className="grid grid-cols-2 gap-3">
+        <FeatureTile href="/vault" label="Vault" icon={FolderHeart} photo={photos.tiles.vault} />
+        <FeatureTile href="/find-care" label="Find Care" icon={Stethoscope} photo={photos.tiles.findCare} />
+        <FeatureTile href="/medicine" label="Medicine" icon={Pill} photo={photos.tiles.medicine} />
+        <FeatureTile href="/tests" label="Tests" icon={FlaskConical} photo={photos.tiles.tests} />
+        <FeatureTile href="/hospitals" label="Hospitals" icon={Building2} photo={photos.tiles.hospitals} />
+        <FeatureTile href="/family" label="Family" icon={Users} photo={photos.tiles.family} />
+      </div>
     </div>
   );
 }

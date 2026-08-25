@@ -7,12 +7,20 @@
   }
 
   body {
+    /* Diagonal, bottom-right to top-left — the theme tint sits in the corner
+       the gradient starts from (0%). `background-attachment: fixed` anchors
+       this to the viewport rather than the full (often much taller) document
+       box; without it, the 0%/100% stops are positions on the whole
+       scrollable page, so on any page taller than one screen the visible
+       viewport only ever showed a sliver near 100% (already-white) — which is
+       why the tint read as "missing" even though it was technically there. */
     background: linear-gradient(
-      180deg,
+      to top left,
       var(--page-bg-from) 0%,
-      var(--page-bg-via) 38%,
+      var(--page-bg-via) 55%,
       var(--page-bg-to) 100%
     );
+    background-attachment: fixed;
     color: var(--color-ink-900);
     min-height: 100dvh;
   }
@@ -58,7 +66,11 @@
 
   /* Tinted variant of glass-panel-strong for the bottom nav — a hint of the
      brand color so the floating bar reads clearly against a light background
-     instead of nearly disappearing into it. */
+     instead of nearly disappearing into it. Light-mode only: --color-primary-100
+     and a hardcoded `white` highlight are both intentionally light-only values,
+     which is why dark mode gets its own block below rather than inheriting
+     this one — the light tint just read as a muddy wash on a dark surface, and
+     the white edge highlight was flatly wrong there.  */
   .nav-glass {
     background: color-mix(
       in oklab,
@@ -72,6 +84,50 @@
     box-shadow:
       0 1px 0 0 color-mix(in oklab, white 95%, transparent) inset,
       0 24px 56px -14px color-mix(in oklab, rgb(var(--shadow-color)) 28%, transparent);
+  }
+
+  :root[data-theme="dark"] .nav-glass {
+    background: color-mix(
+      in oklab,
+      var(--color-primary-600) 22%,
+      color-mix(in oklab, rgb(var(--surface-color)) 88%, transparent)
+    );
+    border: 1px solid color-mix(in oklab, var(--color-primary-500) 35%, transparent);
+    border-top-color: color-mix(in oklab, var(--color-primary-300) 30%, transparent);
+    box-shadow:
+      0 1px 0 0 color-mix(in oklab, var(--color-primary-300) 20%, transparent) inset,
+      0 24px 56px -14px rgb(0 0 0 / 0.5);
+  }
+
+  /* A coral-tinted variant of glass-panel for the one-off community feature
+     row (Blood Donation) on Home — plain glass-panel gave it zero visual
+     separation from every other card on the page, so it read as just another
+     list row instead of a distinct, tappable feature. */
+  .glass-panel-accent {
+    background: color-mix(
+      in oklab,
+      var(--color-coral-500) 10%,
+      color-mix(in oklab, rgb(var(--surface-color)) 82%, transparent)
+    );
+    backdrop-filter: blur(28px) saturate(1.6);
+    -webkit-backdrop-filter: blur(28px) saturate(1.6);
+    border: 1px solid color-mix(in oklab, var(--color-coral-500) 30%, transparent);
+    box-shadow:
+      0 1px 0 0 color-mix(in oklab, white 90%, transparent) inset,
+      0 18px 40px -12px color-mix(in oklab, rgb(var(--shadow-color)) 18%, transparent);
+    border-radius: var(--radius-card);
+  }
+
+  :root[data-theme="dark"] .glass-panel-accent {
+    background: color-mix(
+      in oklab,
+      var(--color-coral-500) 16%,
+      color-mix(in oklab, rgb(var(--surface-color)) 88%, transparent)
+    );
+    border: 1px solid color-mix(in oklab, var(--color-coral-500) 40%, transparent);
+    box-shadow:
+      0 1px 0 0 color-mix(in oklab, var(--color-coral-500) 15%, transparent) inset,
+      0 18px 40px -12px rgb(0 0 0 / 0.4);
   }
 
   .glass-panel-strong {

@@ -56,6 +56,7 @@ export default function AddDocumentPage() {
         fileKey,
         type: values.type,
         tag: values.tag || undefined,
+        doctorId: values.doctorId,
         doctorName: values.doctorName || undefined,
         placeOfTest: values.placeOfTest || undefined,
         note: values.note || undefined,

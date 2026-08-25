@@ -1,6 +1,7 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
+import { DoctorAutocomplete } from "@/components/ui/doctor-autocomplete";
 import { TextField } from "@/components/ui/text-field";
 import { vaultApi } from "@/features/vault/api";
 import { errorMessage } from "@/lib/error-message";
@@ -26,6 +27,7 @@ export default function DocumentDetailPage() {
   });
 
   const [tag, setTag] = useState("");
+  const [doctorId, setDoctorId] = useState<string | undefined>();
   const [doctorName, setDoctorName] = useState("");
   const [placeOfTest, setPlaceOfTest] = useState("");
   const [note, setNote] = useState("");
@@ -34,6 +36,7 @@ export default function DocumentDetailPage() {
   function startEditing() {
     if (!doc) return;
     setTag(doc.tag ?? "");
+    setDoctorId(doc.doctorId);
     setDoctorName(doc.doctorName ?? "");
     setPlaceOfTest(doc.placeOfTest ?? "");
     setNote(doc.note ?? "");
@@ -43,7 +46,7 @@ export default function DocumentDetailPage() {
 
   const updateMutation = useMutation({
     mutationFn: () =>
-      vaultApi.updateDocument(id, { tag, doctorName, placeOfTest, note, documentDate }),
+      vaultApi.updateDocument(id, { tag, doctorId, doctorName, placeOfTest, note, documentDate }),
     onSuccess: (updated) => {
       queryClient.setQueryData(["vault", "documents", "detail", id], updated);
       queryClient.invalidateQueries({ queryKey: ["vault", "documents"] });
@@ -99,11 +102,14 @@ export default function DocumentDetailPage() {
         {editing ? (
           <div className="glass-panel space-y-4 p-5">
             <TextField label="Label" name="tag" value={tag} onChange={(e) => setTag(e.target.value)} />
-            <TextField
+            <DoctorAutocomplete
               label="Doctor name"
-              name="doctorName"
-              value={doctorName}
-              onChange={(e) => setDoctorName(e.target.value)}
+              name={doctorName}
+              doctorId={doctorId}
+              onChange={({ name, doctorId }) => {
+                setDoctorName(name);
+                setDoctorId(doctorId);
+              }}
             />
             <TextField
               label="Place"

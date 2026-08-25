@@ -18,7 +18,7 @@ export function BottomNav() {
   return (
     <div className="pointer-events-none fixed inset-x-0 bottom-0 z-40 flex justify-center pb-[max(1rem,env(safe-area-inset-bottom))]">
       <div className="pointer-events-auto">
-        <nav className="nav-glass flex h-14 items-center gap-1 rounded-[var(--radius-pill)] px-2">
+        <nav className="nav-glass flex h-14 items-center gap-2 rounded-[var(--radius-pill)] px-4">
           {TABS.slice(0, 2).map((tab) => (
             <NavItem key={tab.href} {...tab} active={pathname.startsWith(tab.href)} />
           ))}

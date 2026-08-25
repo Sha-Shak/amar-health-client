@@ -26,6 +26,7 @@ export type CreateDocumentInput = {
   fileKey: string;
   type: DocumentType;
   tag?: string;
+  doctorId?: string;
   doctorName?: string;
   placeOfTest?: string;
   note?: string;

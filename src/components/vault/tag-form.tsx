@@ -1,6 +1,7 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
+import { DoctorAutocomplete } from "@/components/ui/doctor-autocomplete";
 import { TextField } from "@/components/ui/text-field";
 import type { DocumentType } from "@/features/vault/types";
 import { useState } from "react";
@@ -14,6 +15,7 @@ const TYPES: { value: DocumentType; label: string }[] = [
 export type TagFormValues = {
   type: DocumentType;
   tag: string;
+  doctorId?: string;
   doctorName: string;
   placeOfTest: string;
   note: string;
@@ -35,6 +37,7 @@ export function TagForm({
 }) {
   const [type, setType] = useState<DocumentType>(initialType);
   const [tag, setTag] = useState("");
+  const [doctorId, setDoctorId] = useState<string | undefined>();
   const [doctorName, setDoctorName] = useState("");
   const [placeOfTest, setPlaceOfTest] = useState("");
   const [note, setNote] = useState("");
@@ -42,7 +45,7 @@ export function TagForm({
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    onSubmit({ type, tag, doctorName, placeOfTest, note, documentDate });
+    onSubmit({ type, tag, doctorId, doctorName, placeOfTest, note, documentDate });
   }
 
   return (
@@ -77,11 +80,14 @@ export function TagForm({
         />
 
         {type !== "bill" && (
-          <TextField
+          <DoctorAutocomplete
             label="Doctor name"
-            name="doctorName"
-            value={doctorName}
-            onChange={(e) => setDoctorName(e.target.value)}
+            name={doctorName}
+            doctorId={doctorId}
+            onChange={({ name, doctorId }) => {
+              setDoctorName(name);
+              setDoctorId(doctorId);
+            }}
           />
         )}
 

@@ -2,7 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 import { TextField } from "@/components/ui/text-field";
-import { DoctorAutocomplete } from "@/components/reminders/doctor-autocomplete";
+import { DoctorAutocomplete } from "@/components/ui/doctor-autocomplete";
 import { DoseScheduleStepper } from "@/components/reminders/dose-schedule-stepper";
 import { remindersApi, type CreateReminderInput } from "@/features/reminders/api";
 import {

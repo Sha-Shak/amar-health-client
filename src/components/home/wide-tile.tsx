@@ -19,7 +19,7 @@ export function WideTile({
   return (
     <Link
       href={href}
-      className="glass-panel tap-target flex w-full items-center gap-3 p-4 transition-transform duration-100 active:scale-[0.98]"
+      className="glass-panel-accent tap-target flex w-full items-center gap-3 p-4 transition-transform duration-100 active:scale-[0.98]"
     >
       <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-coral-50 text-coral-600">
         <Icon size={20} aria-hidden="true" />
