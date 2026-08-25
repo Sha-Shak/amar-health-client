@@ -1,0 +1,101 @@
+/*
+ * Brand & theme tokens — the ONE file to edit to re-skin the app.
+ * Change a hex value here and it propagates everywhere (Tailwind utilities
+ * like bg-primary-600, and the glass-panel/typography rules in globals.css).
+ *
+ * Light mode is the priority theme — every token below is defined for light
+ * first. Dark mode overrides live in the two blocks at the bottom and only
+ * need to redefine what actually changes (surface color, ink color, shadow
+ * strength) — the brand hues (primary/coral/amber) stay the same in both.
+ */
+
+:root {
+  /* ---- Brand accent — teal scale ---- */
+  --color-primary-50: #f0fdfa;
+  --color-primary-100: #ccfbf1;
+  --color-primary-200: #99f6e4;
+  --color-primary-300: #5eead4;
+  --color-primary-400: #2dd4bf;
+  --color-primary-500: #14b8a6;
+  --color-primary-600: #0d9488;
+  --color-primary-700: #0f766e;
+  --color-primary-800: #115e59;
+  --color-primary-900: #134e4a;
+
+  /* ---- Status colors ---- */
+  --color-coral-500: #ff6b5b;
+  --color-coral-600: #f4543f;
+  --color-amber-500: #f59e0b;
+  --color-amber-600: #d97706;
+  --color-success-500: #22c55e;
+
+  /* ---- Text ---- */
+  --color-ink-900: #0c1917;
+  --color-ink-700: #3f524f;
+  --color-ink-500: #6b7c79;
+
+  /* ---- Typography ---- */
+  --font-sans: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto,
+    ui-sans-serif, system-ui, sans-serif;
+
+  /* ---- Shape ---- */
+  --radius-card: 28px;
+  --radius-sm: 18px;
+  --radius-pill: 9999px;
+
+  /* ---- Semantic surface tokens (theme-aware, referenced by glass utilities) ---- */
+  --surface-color: 255 255 255; /* rgb triplet for white */
+  --page-bg-from: var(--color-primary-50);
+  --page-bg-via: #ffffff;
+  --page-bg-to: #ffffff;
+  --shadow-color: 12 25 23; /* ink-900 as rgb triplet */
+
+  --glass-on-photo-tint: 12 25 23; /* ink-900 */
+}
+
+@theme inline {
+  --color-primary-50: var(--color-primary-50);
+  --color-primary-100: var(--color-primary-100);
+  --color-primary-200: var(--color-primary-200);
+  --color-primary-300: var(--color-primary-300);
+  --color-primary-400: var(--color-primary-400);
+  --color-primary-500: var(--color-primary-500);
+  --color-primary-600: var(--color-primary-600);
+  --color-primary-700: var(--color-primary-700);
+  --color-primary-800: var(--color-primary-800);
+  --color-primary-900: var(--color-primary-900);
+
+  --color-coral-500: var(--color-coral-500);
+  --color-coral-600: var(--color-coral-600);
+  --color-amber-500: var(--color-amber-500);
+  --color-amber-600: var(--color-amber-600);
+  --color-success-500: var(--color-success-500);
+
+  --color-ink-900: var(--color-ink-900);
+  --color-ink-700: var(--color-ink-700);
+  --color-ink-500: var(--color-ink-500);
+
+  --font-sans: var(--font-sans);
+
+  --radius-card: var(--radius-card);
+  --radius-sm: var(--radius-sm);
+  --radius-pill: var(--radius-pill);
+}
+
+/* ---- Dark mode: respected when the user explicitly toggles it (data-theme="dark") ---- */
+:root[data-theme="dark"] {
+  --color-primary-50: #0a2e2a;
+  --color-primary-900: #ccfbf1;
+
+  --color-ink-900: #eef6f4;
+  --color-ink-700: #b9c9c6;
+  --color-ink-500: #8a9c99;
+
+  --surface-color: 20 30 29; /* dark slate, not pure black */
+  --page-bg-from: #0c1917;
+  --page-bg-via: #0f1e1c;
+  --page-bg-to: #0c1917;
+  --shadow-color: 0 0 0;
+
+  --glass-on-photo-tint: 0 0 0;
+}

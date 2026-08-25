@@ -1,26 +1,134 @@
 @import "tailwindcss";
+@import "../styles/tokens.css";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+@layer base {
+  html {
+    font-family: var(--font-sans);
+  }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
+  body {
+    background: linear-gradient(
+      180deg,
+      var(--page-bg-from) 0%,
+      var(--page-bg-via) 38%,
+      var(--page-bg-to) 100%
+    );
+    color: var(--color-ink-900);
+    min-height: 100dvh;
+  }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+  /* Visible keyboard focus everywhere — never suppressed. */
+  :focus-visible {
+    outline: 2px solid var(--color-primary-600);
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.001ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.001ms !important;
+      scroll-behavior: auto !important;
+    }
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+@layer components {
+  /*
+   * Glass tiers — one recipe family, three strengths. Used deliberately
+   * (nav, modals, overlays, floating controls) — never stacked, never the
+   * default for every surface. Plain cards on a plain background remain the
+   * common case.
+   */
+
+  .glass-panel {
+    background: color-mix(in oklab, rgb(var(--surface-color)) 72%, transparent);
+    backdrop-filter: blur(20px) saturate(1.4);
+    -webkit-backdrop-filter: blur(20px) saturate(1.4);
+    border: 1px solid color-mix(in oklab, rgb(var(--surface-color)) 60%, transparent);
+    border-top-color: color-mix(in oklab, rgb(var(--surface-color)) 85%, transparent);
+    box-shadow:
+      0 1px 0 0 color-mix(in oklab, rgb(var(--surface-color)) 90%, transparent) inset,
+      0 18px 40px -12px color-mix(in oklab, rgb(var(--shadow-color)) 18%, transparent);
+    border-radius: var(--radius-card);
+  }
+
+  /* Tinted variant of glass-panel-strong for the bottom nav — a hint of the
+     brand color so the floating bar reads clearly against a light background
+     instead of nearly disappearing into it. */
+  .nav-glass {
+    background: color-mix(
+      in oklab,
+      var(--color-primary-100) 38%,
+      color-mix(in oklab, rgb(var(--surface-color)) 78%, transparent)
+    );
+    backdrop-filter: blur(28px) saturate(1.6);
+    -webkit-backdrop-filter: blur(28px) saturate(1.6);
+    border: 1px solid color-mix(in oklab, var(--color-primary-200) 45%, transparent);
+    border-top-color: color-mix(in oklab, white 90%, transparent);
+    box-shadow:
+      0 1px 0 0 color-mix(in oklab, white 95%, transparent) inset,
+      0 24px 56px -14px color-mix(in oklab, rgb(var(--shadow-color)) 28%, transparent);
+  }
+
+  .glass-panel-strong {
+    background: color-mix(in oklab, rgb(var(--surface-color)) 82%, transparent);
+    backdrop-filter: blur(28px) saturate(1.6);
+    -webkit-backdrop-filter: blur(28px) saturate(1.6);
+    border: 1px solid color-mix(in oklab, rgb(var(--surface-color)) 70%, transparent);
+    border-top-color: color-mix(in oklab, rgb(var(--surface-color)) 92%, transparent);
+    box-shadow:
+      0 1px 0 0 color-mix(in oklab, rgb(var(--surface-color)) 95%, transparent) inset,
+      0 24px 56px -14px color-mix(in oklab, rgb(var(--shadow-color)) 28%, transparent);
+    border-radius: var(--radius-card);
+  }
+
+  .glass-on-photo {
+    background: color-mix(in oklab, rgb(var(--glass-on-photo-tint)) 32%, transparent);
+    backdrop-filter: blur(16px) saturate(1.1);
+    -webkit-backdrop-filter: blur(16px) saturate(1.1);
+    border: 1px solid color-mix(in oklab, white 25%, transparent);
+    color: white;
+    border-radius: var(--radius-card);
+  }
+
+  /* Photo scrim — sits between a photo and any white text/glass over it. */
+  .photo-scrim {
+    background: linear-gradient(
+      0deg,
+      color-mix(in oklab, rgb(var(--glass-on-photo-tint)) 70%, transparent) 0%,
+      color-mix(in oklab, rgb(var(--glass-on-photo-tint)) 10%, transparent) 60%,
+      transparent 100%
+    );
+  }
+
+  /* Touch targets minimum 44x44px — apply to icon-only buttons. */
+  .tap-target {
+    min-width: 44px;
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* Staggered entrance — set --stagger-index on each item. Collapses under
+     prefers-reduced-motion via the global rule in @layer base above. */
+  .animate-stagger-in {
+    animation: stagger-in 0.4s cubic-bezier(0.16, 1, 0.3, 1) backwards;
+    animation-delay: calc(var(--stagger-index, 0) * 70ms);
+  }
+}
+
+@keyframes stagger-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
