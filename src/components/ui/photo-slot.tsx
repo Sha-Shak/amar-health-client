@@ -1,6 +1,27 @@
 import { cn } from "@/lib/cn";
 import Image from "next/image";
 
+// Hosts that need special handling to load at all. img.sasthyaseba.com
+// (bulk-imported doctor/hospital photos) implements Referer-based hotlink
+// protection: any request with a Referer header pointing at a different site
+// gets a 403, but the exact same URL with no Referer (or Referer: sasthyaseba
+// itself) returns 200 — confirmed directly against their CDN. A real
+// `<img>`/`fill` Image always sends the page's Referer on a cross-origin
+// request, which is exactly what trips this; `referrerPolicy="no-referrer"`
+// stops the browser from sending one at all. `unoptimized` matters too: Next's
+// own server-side image optimizer would otherwise fetch the source itself
+// (with its own Referer) and cache a 403 permanently regardless of what the
+// eventual browser request does.
+const REFERRER_PROTECTED_HOSTS = ["img.sasthyaseba.com"];
+
+function needsReferrerWorkaround(src: string): boolean {
+  try {
+    return REFERRER_PROTECTED_HOSTS.includes(new URL(src).hostname);
+  } catch {
+    return false;
+  }
+}
+
 /**
  * Renders a real photo when `src` is provided (see src/config/photos.ts),
  * otherwise a tasteful gradient placeholder so layout/scrim/glass work can
@@ -18,6 +39,7 @@ export function PhotoSlot({
   gradient?: string;
 }) {
   if (src) {
+    const workaround = needsReferrerWorkaround(src);
     return (
       <Image
         src={src}
@@ -25,6 +47,8 @@ export function PhotoSlot({
         fill
         className={cn("object-cover", className)}
         sizes="100vw"
+        unoptimized={workaround}
+        referrerPolicy={workaround ? "no-referrer" : undefined}
       />
     );
   }
