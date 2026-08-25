@@ -1,6 +1,7 @@
 "use client";
 
 import { AvatarPlaceholder } from "@/components/ui/avatar-placeholder";
+import { InstallAppButton, useInstallPrompt } from "@/components/pwa/install-app-button";
 import { SettingsRow } from "@/components/settings/settings-row";
 import { Switch } from "@/components/ui/switch";
 import { useAuth } from "@/components/providers/auth-provider";
@@ -20,6 +21,7 @@ export default function ProfilePage() {
   const router = useRouter();
   const { user, logout } = useAuth();
   const { theme, toggleTheme } = useTheme();
+  const { available: installAvailable } = useInstallPrompt();
   if (!user) return null;
 
   return (
@@ -61,6 +63,13 @@ export default function ProfilePage() {
           <Switch checked={theme === "dark"} onChange={toggleTheme} label="Dark mode" />
         </div>
       </div>
+
+      {installAvailable && (
+        <div>
+          <p className="mb-2 px-1 text-sm font-medium text-ink-500">App</p>
+          <InstallAppButton />
+        </div>
+      )}
 
       <div>
         <p className="mb-2 px-1 text-sm font-medium text-ink-500">Safety</p>

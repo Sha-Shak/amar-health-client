@@ -26,7 +26,7 @@ export default function ChooseMethodPage() {
   return (
     <div className="mx-auto flex w-full max-w-sm flex-1 flex-col justify-center gap-8 px-6 py-10">
       <div className="space-y-2 text-center">
-        <h1 className="text-2xl font-bold">Welcome to Smart Health Vault</h1>
+        <h1 className="text-2xl font-bold">Welcome to Amar Health</h1>
         <p className="text-ink-700">Choose how you&apos;d like to continue</p>
       </div>
 

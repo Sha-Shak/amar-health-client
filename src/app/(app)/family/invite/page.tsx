@@ -42,7 +42,7 @@ export default function InviteFamilyMemberPage() {
 
       <h1 className="mb-1 text-2xl font-bold">Invite a family member</h1>
       <p className="mb-6 text-ink-700">
-        They&apos;ll need an existing Smart Health Vault account to accept.
+        They&apos;ll need an existing Amar Health account to accept.
       </p>
 
       <form onSubmit={handleSubmit} className="glass-panel space-y-5 p-6">

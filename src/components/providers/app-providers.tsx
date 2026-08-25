@@ -1,5 +1,7 @@
 "use client";
 
+import { RegisterServiceWorker } from "@/components/pwa/register-service-worker";
+import { SplashScreen } from "@/components/splash/splash-screen";
 import { Toaster } from "sonner";
 import { AuthProvider } from "./auth-provider";
 import { QueryProvider } from "./query-provider";
@@ -10,6 +12,8 @@ export function AppProviders({ children }: { children: React.ReactNode }) {
     <ThemeProvider>
       <QueryProvider>
         <AuthProvider>
+          <SplashScreen />
+          <RegisterServiceWorker />
           {children}
           <Toaster
             position="top-center"
