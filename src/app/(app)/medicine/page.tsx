@@ -54,7 +54,7 @@ export default function MedicineSearchPage() {
           <button
             type="button"
             onClick={() => setSortMenuOpen((v) => !v)}
-            className="tap-target flex items-center gap-1.5 rounded-[var(--radius-pill)] bg-white/60 px-3 text-sm font-medium text-ink-700"
+            className="tap-target flex items-center gap-1.5 rounded-[var(--radius-pill)] bg-surface-60 px-3 text-sm font-medium text-ink-700"
           >
             <ArrowDownAZ size={16} aria-hidden="true" />
             Sort
@@ -125,7 +125,7 @@ export default function MedicineSearchPage() {
             type="button"
             onClick={() => resultsQuery.fetchNextPage()}
             disabled={resultsQuery.isFetchingNextPage}
-            className="tap-target w-full rounded-[var(--radius-pill)] bg-white/60 text-sm font-medium text-ink-700"
+            className="tap-target w-full rounded-[var(--radius-pill)] bg-surface-60 text-sm font-medium text-ink-700"
           >
             {resultsQuery.isFetchingNextPage ? "Loading…" : "Load more"}
           </button>

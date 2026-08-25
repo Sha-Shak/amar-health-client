@@ -63,7 +63,7 @@ export function TagForm({
               type="button"
               onClick={() => setType(t.value)}
               className={`flex-1 rounded-[var(--radius-pill)] px-3 py-2 text-sm font-semibold transition-colors ${
-                type === t.value ? "bg-primary-600 text-white" : "bg-white/60 text-ink-700"
+                type === t.value ? "bg-primary-600 text-white" : "bg-surface-60 text-ink-700"
               }`}
             >
               {t.label}

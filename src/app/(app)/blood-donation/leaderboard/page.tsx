@@ -59,7 +59,7 @@ export default function BloodLeaderboardPage() {
             >
               <span
                 className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-sm font-bold ${
-                  RANK_STYLES[rank] ?? "bg-white/70 text-ink-700"
+                  RANK_STYLES[rank] ?? "bg-surface-70 text-ink-700"
                 }`}
               >
                 {rank}

@@ -236,7 +236,7 @@ export default function AddReminderPage() {
                           )
                         }
                         className={`tap-target rounded-[var(--radius-pill)] px-3 text-sm font-medium ${
-                          active ? "bg-primary-600 text-white" : "bg-white/60 text-ink-700"
+                          active ? "bg-primary-600 text-white" : "bg-surface-60 text-ink-700"
                         }`}
                       >
                         {day}
@@ -320,7 +320,7 @@ function SelectField({
       <select
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className="w-full rounded-[var(--radius-sm)] border border-black/5 bg-white/70 px-4 py-3 text-ink-900 outline-none focus:border-primary-600/40 focus:ring-2 focus:ring-primary-600/30"
+        className="w-full rounded-[var(--radius-sm)] border border-black/5 bg-surface-70 px-4 py-3 text-ink-900 outline-none focus:border-primary-600/40 focus:ring-2 focus:ring-primary-600/30"
       >
         {options.map((opt) => (
           <option key={opt.value} value={opt.value}>

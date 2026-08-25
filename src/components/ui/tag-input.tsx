@@ -36,7 +36,7 @@ export function TagInput({
   return (
     <div className="space-y-1.5">
       <label className="text-sm font-medium text-ink-700">{label}</label>
-      <div className="flex flex-wrap items-center gap-2 rounded-[var(--radius-sm)] border border-black/5 bg-white/70 px-3 py-2 focus-within:border-primary-600/40 focus-within:ring-2 focus-within:ring-primary-600/30">
+      <div className="flex flex-wrap items-center gap-2 rounded-[var(--radius-sm)] border border-black/5 bg-surface-70 px-3 py-2 focus-within:border-primary-600/40 focus-within:ring-2 focus-within:ring-primary-600/30">
         {values.map((tag) => (
           <span
             key={tag}

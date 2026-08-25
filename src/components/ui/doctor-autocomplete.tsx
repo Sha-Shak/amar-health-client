@@ -52,7 +52,7 @@ export function DoctorAutocomplete({
         onBlur={() => setTimeout(() => setIsOpen(false), 150)}
         placeholder="Search by name…"
         autoComplete="off"
-        className="w-full rounded-[var(--radius-sm)] border border-black/5 bg-white/70 px-4 py-3 text-ink-900 placeholder:text-ink-500 outline-none transition-shadow focus:border-primary-600/40 focus:ring-2 focus:ring-primary-600/30"
+        className="w-full rounded-[var(--radius-sm)] border border-black/5 bg-surface-70 px-4 py-3 text-ink-900 placeholder:text-ink-500 outline-none transition-shadow focus:border-primary-600/40 focus:ring-2 focus:ring-primary-600/30"
       />
       {doctorId && (
         <p className="text-xs text-primary-700">Linked to a doctor in our directory</p>
@@ -69,7 +69,7 @@ export function DoctorAutocomplete({
                   onChange({ name: doctor.name, doctorId: doctor._id });
                   setIsOpen(false);
                 }}
-                className="tap-target flex w-full flex-col items-start rounded-[var(--radius-sm)] px-3 py-2 text-left hover:bg-white/60"
+                className="tap-target flex w-full flex-col items-start rounded-[var(--radius-sm)] px-3 py-2 text-left hover:bg-surface-60"
               >
                 <span className="font-medium">{doctor.name}</span>
                 {doctor.specialties.length > 0 && (

@@ -161,6 +161,22 @@
     );
   }
 
+  /* Theme-aware stand-ins for the many `bg-white/60` / `bg-white/70` surfaces
+     used on inputs, chips, and unselected pill buttons throughout the app.
+     Plain white-with-opacity reads fine in light mode but is nearly
+     invisible against the dark surface in dark mode (the ink-700/900 text
+     sitting on it goes light-on-light) — color-mix against the theme's own
+     surface token keeps the same "frosted" look in both themes. */
+  .bg-surface-60 {
+    background: color-mix(in oklab, rgb(var(--surface-color)) 60%, transparent);
+  }
+  .bg-surface-70 {
+    background: color-mix(in oklab, rgb(var(--surface-color)) 70%, transparent);
+  }
+  .hover\:bg-surface-60:hover {
+    background: color-mix(in oklab, rgb(var(--surface-color)) 60%, transparent);
+  }
+
   /* Touch targets minimum 44x44px — apply to icon-only buttons. */
   .tap-target {
     min-width: 44px;

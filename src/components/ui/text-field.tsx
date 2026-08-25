@@ -21,7 +21,7 @@ export const TextField = forwardRef<HTMLInputElement, TextFieldProps>(function T
         ref={ref}
         id={inputId}
         className={cn(
-          "w-full rounded-[var(--radius-sm)] border border-black/5 bg-white/70 px-4 py-3 text-ink-900",
+          "w-full rounded-[var(--radius-sm)] border border-black/5 bg-surface-70 px-4 py-3 text-ink-900",
           "placeholder:text-ink-500 outline-none transition-shadow",
           "focus:border-primary-600/40 focus:ring-2 focus:ring-primary-600/30",
           error && "border-coral-500/50 focus:ring-coral-500/30",

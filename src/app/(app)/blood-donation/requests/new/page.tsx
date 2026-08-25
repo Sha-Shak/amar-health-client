@@ -70,7 +70,7 @@ export default function NewBloodRequestPage() {
                 type="button"
                 onClick={() => setBloodGroup(g)}
                 className={`tap-target rounded-[var(--radius-sm)] py-2 text-sm font-bold ${
-                  bloodGroup === g ? "bg-coral-600 text-white" : "bg-white/70 text-ink-700"
+                  bloodGroup === g ? "bg-coral-600 text-white" : "bg-surface-70 text-ink-700"
                 }`}
               >
                 {g}
@@ -98,7 +98,7 @@ export default function NewBloodRequestPage() {
                 type="button"
                 onClick={() => setUrgency(u)}
                 className={`tap-target flex-1 rounded-[var(--radius-pill)] px-3 text-sm font-medium capitalize ${
-                  urgency === u ? "bg-coral-600 text-white" : "bg-white/70 text-ink-700"
+                  urgency === u ? "bg-coral-600 text-white" : "bg-surface-70 text-ink-700"
                 }`}
               >
                 {u}

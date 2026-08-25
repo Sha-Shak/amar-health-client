@@ -39,7 +39,7 @@ export function DocumentList({ type }: { type?: DocumentType }) {
           type="button"
           onClick={() => query.fetchNextPage()}
           disabled={query.isFetchingNextPage}
-          className="tap-target w-full rounded-[var(--radius-pill)] bg-white/60 text-sm font-medium text-ink-700"
+          className="tap-target w-full rounded-[var(--radius-pill)] bg-surface-60 text-sm font-medium text-ink-700"
         >
           {query.isFetchingNextPage ? "Loading…" : "Load more"}
         </button>
