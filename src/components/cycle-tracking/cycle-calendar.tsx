@@ -91,8 +91,8 @@ function CycleDayButton(props: DayButtonProps) {
       className={cn(
         "relative mx-auto flex h-10 w-10 items-center justify-center rounded-full text-sm font-medium transition-transform active:scale-90",
         isPeriod && "bg-rose-500 text-white font-semibold",
-        isOvulation && !isPeriod && "border-2 border-rose-500 text-rose-600 font-semibold",
-        isFertile && !isPeriod && "bg-rose-50 text-rose-600",
+        isOvulation && !isPeriod && "border-2 border-primary-600 text-primary-700 font-semibold",
+        isFertile && !isPeriod && "bg-primary-100 text-primary-700",
         isPredicted && !isFertile && "border border-dashed border-rose-400/70 text-rose-600",
         !isPeriod && !isOvulation && !isFertile && !isPredicted && "text-ink-900 hover:bg-surface-60",
         isSelected && "ring-2 ring-primary-600 ring-offset-2 ring-offset-transparent",

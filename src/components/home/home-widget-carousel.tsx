@@ -39,7 +39,7 @@ export function HomeWidgetCarousel({
     {
       key: "blood-donation",
       href: "/blood-donation",
-      panelClass: "glass-panel-accent",
+      panelClass: "glass-panel",
       iconBadgeClass: "bg-coral-50 text-coral-600",
       icon: Droplets,
       label: "Blood Donation",
@@ -93,7 +93,7 @@ export function HomeWidgetCarousel({
           {
             key: "cycle-tracking",
             href: "/cycle-tracking",
-            panelClass: "glass-panel-rose",
+            panelClass: "glass-panel",
             iconBadgeClass: "bg-rose-50 text-rose-600",
             icon: CalendarHeart,
             label: "Cycle Tracker",

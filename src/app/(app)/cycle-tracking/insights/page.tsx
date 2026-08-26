@@ -64,7 +64,7 @@ export default function CycleInsightsPage() {
       {insightsQuery.isLoading && <p className="text-sm text-ink-500">Loading…</p>}
 
       {insights && insights.cyclesConsidered === 0 && (
-        <div className="glass-panel-rose p-5 text-center text-sm text-ink-700">
+        <div className="glass-panel p-5 text-center text-sm text-ink-700">
           Log a couple of periods and this page will start showing your cycle history and patterns.
         </div>
       )}
@@ -73,7 +73,7 @@ export default function CycleInsightsPage() {
         <div className="space-y-5">
           <section>
             <p className="mb-2 px-1 text-sm font-medium text-ink-500">Cycle history</p>
-            <div className="glass-panel-rose divide-y divide-rose-500/10 p-2">
+            <div className="glass-panel divide-y divide-black/5 p-2">
               {insights.recentCycles
                 .slice()
                 .reverse()
@@ -92,7 +92,7 @@ export default function CycleInsightsPage() {
           </section>
 
           {insights.avgPainLevel != null && (
-            <section className="glass-panel-rose flex items-center justify-between p-4">
+            <section className="glass-panel flex items-center justify-between p-4">
               <span className="text-sm font-medium text-ink-700">Average pain level</span>
               <span className="text-lg font-bold text-rose-600">{insights.avgPainLevel}/10</span>
             </section>
@@ -122,16 +122,16 @@ function FrequencySection({ title, items }: { title: string; items: { label: str
   return (
     <section>
       <p className="mb-2 px-1 text-sm font-medium text-ink-500">{title}</p>
-      <div className="glass-panel-rose space-y-2.5 p-4">
+      <div className="glass-panel space-y-2.5 p-4">
         {items.map((item) => (
           <div key={item.label}>
             <div className="mb-1 flex items-center justify-between text-sm">
               <span className="font-medium text-ink-900">{item.label}</span>
               <span className="text-ink-500">{item.count}</span>
             </div>
-            <div className="h-1.5 overflow-hidden rounded-full bg-rose-500/15">
+            <div className="h-1.5 overflow-hidden rounded-full bg-primary-600/15">
               <div
-                className="h-full rounded-full bg-rose-500"
+                className="h-full rounded-full bg-primary-600"
                 style={{ width: `${(item.count / max) * 100}%` }}
               />
             </div>

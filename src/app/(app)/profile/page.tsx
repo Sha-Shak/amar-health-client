@@ -11,6 +11,7 @@ import {
   Download,
   LogOut,
   Moon,
+  Palette,
   ShieldAlert,
   Trash2,
   User as UserIcon,
@@ -55,12 +56,15 @@ export default function ProfilePage() {
 
       <div>
         <p className="mb-2 px-1 text-sm font-medium text-ink-500">Appearance</p>
-        <div className="glass-panel flex items-center gap-3 px-4 py-3.5">
-          <span className="tap-target rounded-full bg-primary-50 text-primary-700">
-            <Moon size={18} aria-hidden="true" />
-          </span>
-          <span className="flex-1 font-medium text-ink-900">Dark mode</span>
-          <Switch checked={theme === "dark"} onChange={toggleTheme} label="Dark mode" />
+        <div className="glass-panel divide-y divide-black/5">
+          <div className="flex items-center gap-3 px-4 py-3.5">
+            <span className="tap-target rounded-full bg-primary-50 text-primary-700">
+              <Moon size={18} aria-hidden="true" />
+            </span>
+            <span className="flex-1 font-medium text-ink-900">Dark mode</span>
+            <Switch checked={theme === "dark"} onChange={toggleTheme} label="Dark mode" />
+          </div>
+          <SettingsRow href="/profile/colors" icon={Palette} label="App colors" />
         </div>
       </div>
 

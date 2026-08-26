@@ -73,7 +73,7 @@ export function DayEditor({ date, log, monthKey }: { date: Date; log: CycleLog |
   }
 
   return (
-    <div className="glass-panel-rose space-y-5 p-5">
+    <div className="glass-panel space-y-5 p-5">
       <div className="flex items-center justify-between">
         <p className="font-semibold text-ink-900">{format(date, "EEEE, MMM d")}</p>
         {log && (
@@ -218,7 +218,7 @@ export function DayEditor({ date, log, monthKey }: { date: Date; log: CycleLog |
         type="button"
         onClick={() => saveMutation.mutate()}
         disabled={saveMutation.isPending}
-        className="tap-target w-full rounded-[var(--radius-pill)] bg-rose-500 font-semibold text-white disabled:opacity-60"
+        className="tap-target w-full rounded-[var(--radius-pill)] bg-primary-600 font-semibold text-white disabled:opacity-60"
       >
         {saveMutation.isPending ? "Saving…" : "Save"}
       </button>

@@ -104,19 +104,20 @@
       0 24px 56px -14px rgb(0 0 0 / 0.5);
   }
 
-  /* A coral-tinted variant of glass-panel for the one-off community feature
-     row (Blood Donation) on Home — plain glass-panel gave it zero visual
-     separation from every other card on the page, so it read as just another
-     list row instead of a distinct, tappable feature. */
+  /* A gently coral-tinted variant of glass-panel — used sparingly, for a
+     single hero callout per screen, not as a general-purpose card. Kept
+     subtle deliberately: an earlier, stronger tint on every Blood
+     Donation/Cycle Tracker surface read as those features fighting the
+     app's teal identity rather than sitting inside it. */
   .glass-panel-accent {
     background: color-mix(
       in oklab,
-      var(--color-coral-500) 10%,
+      var(--color-coral-500) 5%,
       color-mix(in oklab, rgb(var(--surface-color)) 82%, transparent)
     );
     backdrop-filter: blur(28px) saturate(1.6);
     -webkit-backdrop-filter: blur(28px) saturate(1.6);
-    border: 1px solid color-mix(in oklab, var(--color-coral-500) 30%, transparent);
+    border: 1px solid color-mix(in oklab, var(--color-coral-500) 18%, transparent);
     box-shadow:
       0 1px 0 0 color-mix(in oklab, white 90%, transparent) inset,
       0 18px 40px -12px color-mix(in oklab, rgb(var(--shadow-color)) 18%, transparent);
@@ -126,27 +127,28 @@
   :root[data-theme="dark"] .glass-panel-accent {
     background: color-mix(
       in oklab,
-      var(--color-coral-500) 16%,
+      var(--color-coral-500) 9%,
       color-mix(in oklab, rgb(var(--surface-color)) 88%, transparent)
     );
-    border: 1px solid color-mix(in oklab, var(--color-coral-500) 40%, transparent);
+    border: 1px solid color-mix(in oklab, var(--color-coral-500) 24%, transparent);
     box-shadow:
       0 1px 0 0 color-mix(in oklab, var(--color-coral-500) 15%, transparent) inset,
       0 18px 40px -12px rgb(0 0 0 / 0.4);
   }
 
   /* Rose-tinted sibling of glass-panel-accent, for the cycle-tracking
-     feature's summary card — same "distinct from plain glass" reasoning,
-     different hue so it doesn't read as the same feature as Blood Donation. */
+     feature's summary card — same "one hero callout, not every card"
+     reasoning, different hue so it doesn't read as the same feature as
+     Blood Donation. */
   .glass-panel-rose {
     background: color-mix(
       in oklab,
-      var(--color-rose-500) 10%,
+      var(--color-rose-500) 5%,
       color-mix(in oklab, rgb(var(--surface-color)) 82%, transparent)
     );
     backdrop-filter: blur(28px) saturate(1.6);
     -webkit-backdrop-filter: blur(28px) saturate(1.6);
-    border: 1px solid color-mix(in oklab, var(--color-rose-500) 30%, transparent);
+    border: 1px solid color-mix(in oklab, var(--color-rose-500) 18%, transparent);
     box-shadow:
       0 1px 0 0 color-mix(in oklab, white 90%, transparent) inset,
       0 18px 40px -12px color-mix(in oklab, rgb(var(--shadow-color)) 18%, transparent);
@@ -156,10 +158,10 @@
   :root[data-theme="dark"] .glass-panel-rose {
     background: color-mix(
       in oklab,
-      var(--color-rose-500) 16%,
+      var(--color-rose-500) 9%,
       color-mix(in oklab, rgb(var(--surface-color)) 88%, transparent)
     );
-    border: 1px solid color-mix(in oklab, var(--color-rose-500) 40%, transparent);
+    border: 1px solid color-mix(in oklab, var(--color-rose-500) 24%, transparent);
     box-shadow:
       0 1px 0 0 color-mix(in oklab, var(--color-rose-500) 15%, transparent) inset,
       0 18px 40px -12px rgb(0 0 0 / 0.4);

@@ -150,8 +150,8 @@ export default function CycleTrackingPage() {
         <div className="mt-3 flex flex-wrap gap-x-4 gap-y-1.5 text-xs text-ink-500">
           <Legend swatch="bg-rose-500" label="Period" />
           <Legend swatch="border border-dashed border-rose-400/70" label="Predicted" />
-          <Legend swatch="bg-rose-50" label="Fertile" />
-          <Legend swatch="border-2 border-rose-500" label="Ovulation" />
+          <Legend swatch="bg-primary-100" label="Fertile" />
+          <Legend swatch="border-2 border-primary-600" label="Ovulation" />
         </div>
         {!isToday(selectedDate) && (
           <button
@@ -171,9 +171,9 @@ export default function CycleTrackingPage() {
 
       <Link
         href="/find-care?specialty=gynecology"
-        className="glass-panel-rose mt-5 flex items-center gap-3 p-4 transition-transform duration-100 active:scale-[0.98]"
+        className="glass-panel mt-5 flex items-center gap-3 p-4 transition-transform duration-100 active:scale-[0.98]"
       >
-        <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-rose-50 text-rose-600">
+        <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-primary-50 text-primary-700">
           <Stethoscope size={20} aria-hidden="true" />
         </span>
         <span className="min-w-0 flex-1">
