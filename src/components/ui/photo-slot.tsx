@@ -22,6 +22,15 @@ function needsReferrerWorkaround(src: string): boolean {
   }
 }
 
+// next/image throws synchronously for any src that isn't a leading-slash
+// path or an absolute URL — a crash, not a broken-image icon. User-supplied
+// values (avatarUrl, most commonly) can be a bare legacy fileKey from before
+// the backend started resolving it (see docs/07-file-uploads.md), so treat
+// anything that doesn't look loadable as absent rather than let it crash.
+function isLoadableSrc(src: string): boolean {
+  return src.startsWith("/") || /^https?:\/\//.test(src);
+}
+
 /**
  * Renders a real photo when `src` is provided (see src/config/photos.ts),
  * otherwise a tasteful gradient placeholder so layout/scrim/glass work can
@@ -48,7 +57,7 @@ export function PhotoSlot({
   sizes?: string;
   priority?: boolean;
 }) {
-  if (src) {
+  if (src && isLoadableSrc(src)) {
     const workaround = needsReferrerWorkaround(src);
     return (
       <Image
