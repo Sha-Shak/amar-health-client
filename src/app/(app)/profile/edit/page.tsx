@@ -8,6 +8,7 @@ import { TextField } from "@/components/ui/text-field";
 import { authApi, uploadFile } from "@/features/auth/api";
 import { errorMessage } from "@/lib/error-message";
 import { useMutation } from "@tanstack/react-query";
+import imageCompression from "browser-image-compression";
 import { ChevronLeft, User } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -49,11 +50,19 @@ export default function EditProfilePage() {
     mutationFn: async () => {
       let avatarUrl: string | undefined;
       if (avatarFile) {
+        // Avatars only ever render small (≤64px, a few multiples of that for
+        // retina) — 512px/0.5MB is generous headroom, not a visible quality
+        // cut, and shrinks a typical multi-MB phone-camera photo by 90%+.
+        const compressed = await imageCompression(avatarFile, {
+          maxSizeMB: 0.5,
+          maxWidthOrHeight: 512,
+          useWebWorker: true,
+        });
         const { uploadUrl, fileKey } = await authApi.requestPresignedUrl(
           "avatar",
-          avatarFile.type as "image/jpeg" | "image/png" | "image/webp"
+          compressed.type as "image/jpeg" | "image/png" | "image/webp"
         );
-        await uploadFile(uploadUrl, avatarFile);
+        await uploadFile(uploadUrl, compressed);
         avatarUrl = fileKey;
       }
       return authApi.updateMe({
