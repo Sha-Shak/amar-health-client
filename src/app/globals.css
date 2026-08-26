@@ -135,6 +135,36 @@
       0 18px 40px -12px rgb(0 0 0 / 0.4);
   }
 
+  /* Rose-tinted sibling of glass-panel-accent, for the cycle-tracking
+     feature's summary card — same "distinct from plain glass" reasoning,
+     different hue so it doesn't read as the same feature as Blood Donation. */
+  .glass-panel-rose {
+    background: color-mix(
+      in oklab,
+      var(--color-rose-500) 10%,
+      color-mix(in oklab, rgb(var(--surface-color)) 82%, transparent)
+    );
+    backdrop-filter: blur(28px) saturate(1.6);
+    -webkit-backdrop-filter: blur(28px) saturate(1.6);
+    border: 1px solid color-mix(in oklab, var(--color-rose-500) 30%, transparent);
+    box-shadow:
+      0 1px 0 0 color-mix(in oklab, white 90%, transparent) inset,
+      0 18px 40px -12px color-mix(in oklab, rgb(var(--shadow-color)) 18%, transparent);
+    border-radius: var(--radius-card);
+  }
+
+  :root[data-theme="dark"] .glass-panel-rose {
+    background: color-mix(
+      in oklab,
+      var(--color-rose-500) 16%,
+      color-mix(in oklab, rgb(var(--surface-color)) 88%, transparent)
+    );
+    border: 1px solid color-mix(in oklab, var(--color-rose-500) 40%, transparent);
+    box-shadow:
+      0 1px 0 0 color-mix(in oklab, var(--color-rose-500) 15%, transparent) inset,
+      0 18px 40px -12px rgb(0 0 0 / 0.4);
+  }
+
   .glass-panel-strong {
     background: color-mix(in oklab, rgb(var(--surface-color)) 82%, transparent);
     backdrop-filter: blur(28px) saturate(1.6);

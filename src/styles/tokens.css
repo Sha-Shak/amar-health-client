@@ -29,6 +29,13 @@
   --color-amber-600: #d97706;
   --color-success-500: #22c55e;
 
+  /* ---- Cycle tracking accent — soft rose, distinct from coral (blood
+     donation already owns that) and from the teal brand hue. ---- */
+  --color-rose-50: #fff1f4;
+  --color-rose-400: #fb7195;
+  --color-rose-500: #f4436e;
+  --color-rose-600: #d92858;
+
   /* ---- Text ---- */
   --color-ink-900: #0c1917;
   --color-ink-700: #3f524f;
@@ -70,6 +77,11 @@
   --color-amber-500: var(--color-amber-500);
   --color-amber-600: var(--color-amber-600);
   --color-success-500: var(--color-success-500);
+
+  --color-rose-50: var(--color-rose-50);
+  --color-rose-400: var(--color-rose-400);
+  --color-rose-500: var(--color-rose-500);
+  --color-rose-600: var(--color-rose-600);
 
   --color-ink-900: var(--color-ink-900);
   --color-ink-700: var(--color-ink-700);

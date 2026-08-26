@@ -8,7 +8,17 @@ import { photos } from "@/config/photos";
 import { homeApi } from "@/features/home/api";
 import { remindersApi } from "@/features/reminders/api";
 import { useQuery } from "@tanstack/react-query";
-import { Bell, Building2, Droplets, FlaskConical, FolderHeart, Pill, Stethoscope, Users } from "lucide-react";
+import {
+  Bell,
+  Building2,
+  CalendarHeart,
+  Droplets,
+  FlaskConical,
+  FolderHeart,
+  Pill,
+  Stethoscope,
+  Users,
+} from "lucide-react";
 import Link from "next/link";
 
 export default function HomeDashboardPage() {
@@ -109,6 +119,14 @@ export default function HomeDashboardPage() {
         <FeatureTile href="/tests" label="Tests" icon={FlaskConical} photo={photos.tiles.tests} />
         <FeatureTile href="/hospitals" label="Hospitals" icon={Building2} photo={photos.tiles.hospitals} />
         <FeatureTile href="/family" label="Family" icon={Users} photo={photos.tiles.family} />
+        {user?.gender === "female" && (
+          <FeatureTile
+            href="/cycle-tracking"
+            label="Cycle Tracker"
+            icon={CalendarHeart}
+            gradient="from-rose-500 to-ink-900"
+          />
+        )}
       </div>
     </div>
   );
