@@ -20,6 +20,7 @@ export const photos = {
   },
   tiles: {
     vault: "/images/tiles/vault.webp",
+    bloodDonation: "/images/tiles/blood-donation.webp",
     findCare: "/images/tiles/find-care.webp",
     medicine: "/images/tiles/medicine.webp",
     family: "/images/tiles/family.webp",

@@ -14,6 +14,7 @@ import {
   Bell,
   Building2,
   CalendarHeart,
+  Droplets,
   FlaskConical,
   FolderHeart,
   HeartPulse,
@@ -118,28 +119,53 @@ export default function HomeDashboardPage() {
 }
 
 function ExploreGrid({ showCycleTracker }: { showCycleTracker: boolean }) {
-  const tiles = [
+  // Split around Cycle Tracker deliberately, not just appended at the end —
+  // it's the one tile that's only relevant to some users, so it gets its
+  // own full-width row planted in the middle of the grid rather than
+  // blending into the regular 2-up flow.
+  const before = [
     { href: "/health-tracker", label: "Health Tracker", icon: HeartPulse, photo: photos.tiles.healthTracker },
     { href: "/vault", label: "Vault", icon: FolderHeart, photo: photos.tiles.vault },
+    { href: "/blood-donation", label: "Blood Donation", icon: Droplets, photo: photos.tiles.bloodDonation },
     { href: "/hospitals", label: "Hospitals", icon: Building2, photo: photos.tiles.hospitals },
+  ];
+  const after = [
     { href: "/find-care", label: "Find Care", icon: Stethoscope, photo: photos.tiles.findCare },
     { href: "/medicine", label: "Medicine", icon: Pill, photo: photos.tiles.medicine },
     { href: "/family", label: "Family", icon: Users, photo: photos.tiles.family },
     { href: "/tests", label: "Tests", icon: FlaskConical, photo: photos.tiles.tests },
-    ...(showCycleTracker
-      ? [{ href: "/cycle-tracking", label: "Cycle Tracker", icon: CalendarHeart, photo: photos.tiles.cycleTracking }]
-      : []),
   ];
 
-  // An odd tile count leaves a lone tile alone in the grid's last row with
-  // half the row empty — stretch just that last tile across both columns
-  // instead, so the grid always ends flush.
-  const isOdd = tiles.length % 2 === 1;
+  // An odd tile count leaves a lone tile alone in its grid row with half the
+  // row empty — stretch just that last tile across both columns instead, so
+  // each half always ends flush regardless of how many tiles it has.
+  const beforeSpansLast = before.length % 2 === 1;
+  const afterSpansLast = after.length % 2 === 1;
 
   return (
     <div className="grid grid-cols-2 gap-3">
-      {tiles.map((tile, i) => (
-        <FeatureTile key={tile.href} {...tile} className={isOdd && i === tiles.length - 1 ? "col-span-2" : undefined} />
+      {before.map((tile, i) => (
+        <FeatureTile
+          key={tile.href}
+          {...tile}
+          className={beforeSpansLast && i === before.length - 1 ? "col-span-2" : undefined}
+        />
+      ))}
+      {showCycleTracker && (
+        <FeatureTile
+          href="/cycle-tracking"
+          label="Cycle Tracker"
+          icon={CalendarHeart}
+          photo={photos.tiles.cycleTracking}
+          className="col-span-2"
+        />
+      )}
+      {after.map((tile, i) => (
+        <FeatureTile
+          key={tile.href}
+          {...tile}
+          className={afterSpansLast && i === after.length - 1 ? "col-span-2" : undefined}
+        />
       ))}
     </div>
   );
