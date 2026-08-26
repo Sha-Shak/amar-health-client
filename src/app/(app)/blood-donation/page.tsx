@@ -26,6 +26,9 @@ export default function BloodDonationHubPage() {
   });
 
   const hasBloodGroup = Boolean(user?.bloodGroup && user.bloodGroup !== "unknown");
+  const showEligibleBanner = Boolean(
+    profile?.lastDonationDate && profile.eligibleToDonateAgain && !profile.isAvailable
+  );
 
   return (
     <div className="mx-auto w-full max-w-sm px-5 pt-8 pb-6">
@@ -36,6 +39,23 @@ export default function BloodDonationHubPage() {
       <p className="mb-6 text-sm text-ink-700">
         Find blood when you need it, or step up when someone else does.
       </p>
+
+      {showEligibleBanner && (
+        <div className="glass-panel mb-4 flex items-center justify-between gap-3 border border-coral-200 bg-coral-50/60 p-4">
+          <div className="min-w-0">
+            <p className="font-semibold text-coral-700">You&apos;re eligible to donate again</p>
+            <p className="text-xs text-ink-600">It&apos;s been a while since your last donation — ready to help again?</p>
+          </div>
+          <button
+            type="button"
+            onClick={() => availabilityMutation.mutate(true)}
+            disabled={availabilityMutation.isPending}
+            className="shrink-0 rounded-[var(--radius-pill)] bg-coral-600 px-3 py-2 text-xs font-semibold text-white"
+          >
+            I&apos;m available
+          </button>
+        </div>
+      )}
 
       <div className="glass-panel space-y-4 p-5">
         <div className="flex items-center justify-between">

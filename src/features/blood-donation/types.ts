@@ -59,6 +59,7 @@ export type DonorProfile = {
   totalDonations: number;
   totalBags: number;
   points: number;
+  eligibleToDonateAgain: boolean;
 };
 
 export type PublicDonor = {

@@ -63,6 +63,12 @@ export const authApi = {
       medicalConditions?: string[];
       emergencyContact?: { name?: string; relationship?: string; phone?: string };
     }>(`/emergency-pass/${shareToken}`, { auth: false }),
+
+  subscribeToPush: (subscription: { endpoint: string; keys: { p256dh: string; auth: string } }) =>
+    api.post<{ message: string }>("/patient/me/push-subscription", subscription),
+
+  unsubscribeFromPush: (endpoint: string) =>
+    api.delete<{ message: string }>("/patient/me/push-subscription", { body: { endpoint } }),
 };
 
 // The presigned uploadUrl is a direct storage endpoint (§9) — bytes go straight

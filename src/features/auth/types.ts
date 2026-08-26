@@ -5,6 +5,7 @@ export type NotificationPreferences = {
   bookingUpdates: boolean;
   familyAlerts: boolean;
   productUpdates: boolean;
+  bloodDonationAlerts: boolean;
 };
 
 export type User = {

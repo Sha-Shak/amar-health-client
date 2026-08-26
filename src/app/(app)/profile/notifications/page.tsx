@@ -4,7 +4,8 @@ import { useAuth } from "@/components/providers/auth-provider";
 import { Switch } from "@/components/ui/switch";
 import { authApi } from "@/features/auth/api";
 import type { NotificationPreferences } from "@/features/auth/types";
-import { useMutation } from "@tanstack/react-query";
+import { getPushSubscriptionState, isPushSupported, subscribeToPush, unsubscribeFromPush } from "@/lib/push";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { ChevronLeft } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -15,12 +16,14 @@ const DEFAULT_PREFS: NotificationPreferences = {
   bookingUpdates: true,
   familyAlerts: true,
   productUpdates: false,
+  bloodDonationAlerts: true,
 };
 
 const ROWS: { key: keyof NotificationPreferences; label: string; description: string }[] = [
   { key: "reminderAlerts", label: "Reminder alerts", description: "Medicine, habit, and appointment reminders" },
   { key: "bookingUpdates", label: "Booking updates", description: "Confirmations and changes to your bookings" },
   { key: "familyAlerts", label: "Family alerts", description: "Activity from people in your family group" },
+  { key: "bloodDonationAlerts", label: "Blood donation alerts", description: "Matching requests and eligibility reminders" },
   { key: "productUpdates", label: "Product updates", description: "New features and occasional announcements" },
 ];
 
@@ -36,6 +39,18 @@ export default function NotificationsPage() {
       authApi.updateMe({ notificationPreferences: next }),
     onSuccess: () => refetch(),
     onError: () => toast.error("Couldn't save that — try again"),
+  });
+
+  const pushStateQuery = useQuery({
+    queryKey: ["push", "subscription-state"],
+    queryFn: getPushSubscriptionState,
+    enabled: isPushSupported(),
+  });
+
+  const pushMutation = useMutation({
+    mutationFn: (enable: boolean) => (enable ? subscribeToPush() : unsubscribeFromPush()),
+    onSuccess: () => pushStateQuery.refetch(),
+    onError: (error) => toast.error(error instanceof Error ? error.message : "Couldn't update push settings"),
   });
 
   function toggle(key: keyof NotificationPreferences, checked: boolean) {
@@ -57,6 +72,20 @@ export default function NotificationsPage() {
         <ChevronLeft size={22} aria-hidden="true" />
       </button>
       <h1 className="mb-6 text-2xl font-bold">Notifications</h1>
+
+      {isPushSupported() && (
+        <div className="glass-panel mb-4 flex items-center gap-3 px-4 py-4">
+          <div className="min-w-0 flex-1">
+            <p className="font-medium">Push notifications</p>
+            <p className="text-sm text-ink-500">Get alerts on this device even when the app is closed</p>
+          </div>
+          <Switch
+            checked={pushStateQuery.data ?? false}
+            onChange={(checked) => pushMutation.mutate(checked)}
+            label="Push notifications"
+          />
+        </div>
+      )}
 
       <div className="glass-panel divide-y divide-black/5">
         {ROWS.map((row) => (

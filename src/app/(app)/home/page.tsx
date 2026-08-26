@@ -8,6 +8,7 @@ import { photos } from "@/config/photos";
 import { cycleTrackingApi } from "@/features/cycle-tracking/api";
 import { healthTrackerApi } from "@/features/health-tracker/api";
 import { homeApi } from "@/features/home/api";
+import { notificationsApi } from "@/features/notifications/api";
 import { remindersApi } from "@/features/reminders/api";
 import { useQuery } from "@tanstack/react-query";
 import {
@@ -54,6 +55,11 @@ export default function HomeDashboardPage() {
     queryFn: healthTrackerApi.getInsights,
   });
 
+  const unreadCountQuery = useQuery({
+    queryKey: ["notifications", "unread-count"],
+    queryFn: notificationsApi.getUnreadCount,
+  });
+
   const reminders = remindersQuery.data ?? [];
   const upcomingReminders = upcomingQuery.data?.items ?? [];
   const vaultSummary = vaultSummaryQuery.data;
@@ -71,12 +77,12 @@ export default function HomeDashboardPage() {
         </div>
         <div className="flex items-center gap-2">
           <Link
-            href="/reminders"
-            aria-label="Reminders"
+            href="/notifications"
+            aria-label="Notifications"
             className="tap-target relative rounded-full bg-primary-50 text-primary-700"
           >
             <Bell size={20} aria-hidden="true" />
-            {reminders.length > 0 && (
+            {(unreadCountQuery.data?.count ?? 0) > 0 && (
               <span className="absolute right-2 top-2 h-2 w-2 rounded-full bg-coral-500" />
             )}
           </Link>
