@@ -83,6 +83,14 @@ export default function EmergencyPassPage() {
 
         <h1 className="text-3xl font-extrabold">{data.name ?? "Unknown"}</h1>
 
+        <a
+          href="tel:999"
+          className="flex items-center justify-between rounded-2xl bg-coral-500 px-6 py-4 font-bold text-black"
+        >
+          <span>Call Bangladesh Emergency</span>
+          <span className="text-2xl">999</span>
+        </a>
+
         <div className="rounded-2xl border-2 border-coral-500 bg-coral-500/10 px-6 py-5">
           <p className="text-sm font-medium uppercase tracking-wide text-coral-400">Blood group</p>
           <p className="text-5xl font-extrabold">{data.bloodGroup ?? "Unknown"}</p>

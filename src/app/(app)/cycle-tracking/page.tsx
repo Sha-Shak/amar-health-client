@@ -167,7 +167,9 @@ export default function CycleTrackingPage() {
         )}
       </div>
 
-      <DayEditor key={selectedDateStr} date={selectedDate} log={selectedLog} monthKey={monthStr} />
+      {logsQuery.isFetched && (
+        <DayEditor key={selectedDateStr} date={selectedDate} log={selectedLog} monthKey={monthStr} />
+      )}
 
       <Link
         href="/find-care?specialty=gynecology"

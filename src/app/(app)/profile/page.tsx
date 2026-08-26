@@ -12,6 +12,7 @@ import {
   LogOut,
   Moon,
   Palette,
+  Phone,
   ShieldAlert,
   Trash2,
   User as UserIcon,
@@ -78,6 +79,12 @@ export default function ProfilePage() {
       <div>
         <p className="mb-2 px-1 text-sm font-medium text-ink-500">Safety</p>
         <div className="glass-panel divide-y divide-black/5">
+          <a href="tel:999" className="flex items-center gap-3 px-4 py-3.5">
+            <span className="tap-target rounded-full bg-coral-50 text-coral-600">
+              <Phone size={18} aria-hidden="true" />
+            </span>
+            <span className="flex-1 font-medium text-ink-900">Emergency — call 999</span>
+          </a>
           <SettingsRow
             href="/profile/emergency-pass"
             icon={ShieldAlert}

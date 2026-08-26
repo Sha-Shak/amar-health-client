@@ -26,6 +26,8 @@ export default function EditProfilePage() {
   const [gender, setGender] = useState(() => user?.gender ?? "");
   const [bloodGroup, setBloodGroup] = useState(() => user?.bloodGroup ?? "");
   const [nid, setNid] = useState(() => user?.nid ?? "");
+  const [heightCm, setHeightCm] = useState(() => user?.heightCm?.toString() ?? "");
+  const [weightKg, setWeightKg] = useState(() => user?.weightKg?.toString() ?? "");
   const [medicalConditions, setMedicalConditions] = useState<string[]>(
     () => user?.medicalConditions ?? []
   );
@@ -60,6 +62,8 @@ export default function EditProfilePage() {
         ...(gender ? { gender } : {}),
         bloodGroup: bloodGroup || "unknown",
         nid,
+        ...(heightCm ? { heightCm: Number(heightCm) } : {}),
+        ...(weightKg ? { weightKg: Number(weightKg) } : {}),
         emergencyContact: {
           name: contactName,
           relationship: contactRelationship,
@@ -144,6 +148,26 @@ export default function EditProfilePage() {
           ]}
         />
         <TextField label="NID (optional)" name="nid" value={nid} onChange={(e) => setNid(e.target.value)} />
+        <div className="grid grid-cols-2 gap-3">
+          <TextField
+            label="Height (cm)"
+            name="heightCm"
+            type="number"
+            min={50}
+            max={250}
+            value={heightCm}
+            onChange={(e) => setHeightCm(e.target.value)}
+          />
+          <TextField
+            label="Weight (kg)"
+            name="weightKg"
+            type="number"
+            min={1}
+            max={400}
+            value={weightKg}
+            onChange={(e) => setWeightKg(e.target.value)}
+          />
+        </div>
         <TagInput
           label="Medical conditions"
           values={medicalConditions}

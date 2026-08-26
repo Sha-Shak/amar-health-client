@@ -6,10 +6,21 @@ import { HomeCarousel } from "@/components/home/home-carousel";
 import { HomeWidgetCarousel } from "@/components/home/home-widget-carousel";
 import { photos } from "@/config/photos";
 import { cycleTrackingApi } from "@/features/cycle-tracking/api";
+import { healthTrackerApi } from "@/features/health-tracker/api";
 import { homeApi } from "@/features/home/api";
 import { remindersApi } from "@/features/reminders/api";
 import { useQuery } from "@tanstack/react-query";
-import { Bell, Building2, CalendarHeart, FlaskConical, FolderHeart, Pill, Stethoscope, Users } from "lucide-react";
+import {
+  Bell,
+  Building2,
+  CalendarHeart,
+  FlaskConical,
+  FolderHeart,
+  HeartPulse,
+  Pill,
+  Stethoscope,
+  Users,
+} from "lucide-react";
 import Link from "next/link";
 
 export default function HomeDashboardPage() {
@@ -35,6 +46,11 @@ export default function HomeDashboardPage() {
     queryKey: ["cycle-summary"],
     queryFn: cycleTrackingApi.getSummary,
     enabled: showCycleTracker,
+  });
+
+  const healthInsightsQuery = useQuery({
+    queryKey: ["health-insights"],
+    queryFn: healthTrackerApi.getInsights,
   });
 
   const reminders = remindersQuery.data ?? [];
@@ -92,6 +108,7 @@ export default function HomeDashboardPage() {
         upcomingReminders={upcomingReminders}
         cycleSummary={cycleSummaryQuery.data}
         showCycleTracker={showCycleTracker}
+        healthInsights={healthInsightsQuery.data}
       />
 
       <h2 className="mb-3 mt-3 text-lg font-semibold">Explore</h2>
@@ -102,6 +119,12 @@ export default function HomeDashboardPage() {
         <FeatureTile href="/tests" label="Tests" icon={FlaskConical} photo={photos.tiles.tests} />
         <FeatureTile href="/hospitals" label="Hospitals" icon={Building2} photo={photos.tiles.hospitals} />
         <FeatureTile href="/family" label="Family" icon={Users} photo={photos.tiles.family} />
+        <FeatureTile
+          href="/health-tracker"
+          label="Health Tracker"
+          icon={HeartPulse}
+          gradient="from-primary-600 to-ink-900"
+        />
         {showCycleTracker && (
           <FeatureTile
             href="/cycle-tracking"

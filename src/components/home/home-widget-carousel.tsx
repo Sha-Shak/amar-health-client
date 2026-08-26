@@ -2,10 +2,11 @@
 
 import type { CycleSummary } from "@/features/cycle-tracking/types";
 import { phaseLabel } from "@/features/cycle-tracking/types";
+import type { HealthInsights } from "@/features/health-tracker/types";
 import type { VaultSummary } from "@/features/home/types";
 import type { Reminder } from "@/features/reminders/types";
 import { useSwipeableCarousel } from "@/hooks/use-swipeable-carousel";
-import { Bell, CalendarHeart, ChevronRight, Droplets, FolderHeart } from "lucide-react";
+import { Bell, CalendarHeart, ChevronRight, Droplets, FolderHeart, HeartPulse } from "lucide-react";
 import { useRouter } from "next/navigation";
 
 const INTERVAL_MS = 5500;
@@ -26,12 +27,14 @@ export function HomeWidgetCarousel({
   upcomingReminders,
   cycleSummary,
   showCycleTracker,
+  healthInsights,
 }: {
   vaultSummary: VaultSummary | undefined;
   todayReminders: Reminder[];
   upcomingReminders: Reminder[];
   cycleSummary: CycleSummary | undefined;
   showCycleTracker: boolean;
+  healthInsights: HealthInsights | undefined;
 }) {
   const router = useRouter();
 
@@ -87,6 +90,21 @@ export function HomeWidgetCarousel({
         }
         return <p className="text-sm text-ink-500">Nothing scheduled — add a reminder</p>;
       },
+    },
+    {
+      key: "health-tracker",
+      href: "/health-tracker",
+      panelClass: "glass-panel",
+      iconBadgeClass: "bg-primary-50 text-primary-700",
+      icon: HeartPulse,
+      label: "Health Tracker",
+      render: () => (
+        <p className="text-sm text-ink-500">
+          {healthInsights && healthInsights.totalLogged > 0
+            ? `${healthInsights.totalLogged} check-in${healthInsights.totalLogged === 1 ? "" : "s"} logged`
+            : "Track weight, mood, BP, and more"}
+        </p>
+      ),
     },
     ...(showCycleTracker
       ? [

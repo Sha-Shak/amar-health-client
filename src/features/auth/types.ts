@@ -20,6 +20,8 @@ export type User = {
   gender?: "male" | "female" | "other" | "prefer_not_to_say";
   bloodGroup?: string;
   nid?: string;
+  heightCm?: number;
+  weightKg?: number;
   emergencyContact?: EmergencyContact;
   medicalConditions?: string[];
   allergies?: string[];
