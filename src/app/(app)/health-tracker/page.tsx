@@ -5,9 +5,10 @@ import { HealthDayEditor } from "@/components/health-tracker/health-day-editor";
 import { TrackerSettingsForm } from "@/components/health-tracker/tracker-settings-form";
 import { healthTrackerApi } from "@/features/health-tracker/api";
 import { nextDueDate } from "@/features/health-tracker/types";
+import { startTour, useAutoTour } from "@/lib/tour";
 import { useQuery } from "@tanstack/react-query";
 import { endOfMonth, format, isPast, isToday, parseISO, startOfMonth } from "date-fns";
-import { BarChart3, ChevronLeft, HeartPulse, Settings2 } from "lucide-react";
+import { BarChart3, ChevronLeft, HeartPulse, HelpCircle, Settings2 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -57,6 +58,41 @@ export default function HealthTrackerPage() {
       : null;
   const isDue = !insightsQuery.data?.latestDate || (due && (isPast(due) || isToday(due)));
 
+  const tourSteps = [
+      {
+        popover: {
+          title: "Health Tracker, in short",
+          description: "Log the metrics you picked, on the schedule you chose — the calendar shows how you're trending.",
+        },
+      },
+      {
+        element: '[data-tour="ht-calendar"]',
+        disableActiveInteraction: true,
+        popover: {
+          title: "Tap any day to log it",
+          description: "Colors show how that day went — green for good, amber for okay, coral for tough.",
+        },
+      },
+      {
+        element: '[data-tour="ht-insights"]',
+        disableActiveInteraction: true,
+        popover: {
+          title: "Insights",
+          description: "Trends across everything you've logged, plus an overall health score once you have enough data.",
+        },
+      },
+      {
+        element: '[data-tour="ht-settings"]',
+        disableActiveInteraction: true,
+        popover: {
+          title: "Change anytime",
+          description: "Adjust your check-in frequency or which metrics you track here.",
+        },
+      },
+  ];
+
+  useAutoTour("health-tracker-overview", tourSteps, Boolean(settings?.setupComplete));
+
   return (
     <div className="mx-auto w-full max-w-sm px-5 pb-28 pt-6">
       <div className="mb-4 flex items-center justify-between">
@@ -73,9 +109,20 @@ export default function HealthTrackerPage() {
           Health Tracker
         </h1>
         <div className="-mr-2 flex items-center">
+          {settings?.setupComplete && (
+            <button
+              type="button"
+              aria-label="Replay tour"
+              onClick={() => startTour("health-tracker-overview", tourSteps)}
+              className="tap-target rounded-full text-ink-700"
+            >
+              <HelpCircle size={20} aria-hidden="true" />
+            </button>
+          )}
           <Link
             href="/health-tracker/insights"
             aria-label="Health insights"
+            data-tour="ht-insights"
             className="tap-target rounded-full text-ink-700"
           >
             <BarChart3 size={20} aria-hidden="true" />
@@ -83,6 +130,7 @@ export default function HealthTrackerPage() {
           <Link
             href="/health-tracker/settings"
             aria-label="Health tracker settings"
+            data-tour="ht-settings"
             className="tap-target rounded-full text-ink-700"
           >
             <Settings2 size={20} aria-hidden="true" />
@@ -118,7 +166,7 @@ export default function HealthTrackerPage() {
             </div>
           )}
 
-          <div className="glass-panel mb-5 p-4">
+          <div className="glass-panel mb-5 p-4" data-tour="ht-calendar">
             <HealthCalendar
               month={month}
               onMonthChange={setMonth}

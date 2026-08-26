@@ -11,6 +11,7 @@ import { healthTrackerApi } from "@/features/health-tracker/api";
 import { homeApi } from "@/features/home/api";
 import { notificationsApi } from "@/features/notifications/api";
 import { remindersApi } from "@/features/reminders/api";
+import { startTour, useAutoTour } from "@/lib/tour";
 import { useQuery } from "@tanstack/react-query";
 import {
   Bell,
@@ -20,6 +21,7 @@ import {
   FlaskConical,
   FolderHeart,
   HeartPulse,
+  HelpCircle,
   Pill,
   Stethoscope,
   Users,
@@ -73,6 +75,50 @@ export default function HomeDashboardPage() {
   const isLoading = remindersQuery.isLoading || vaultSummaryQuery.isLoading || upcomingQuery.isLoading;
 
   const firstName = (user?.name ?? "there").split(" ")[0];
+  const featureCount = 8 + (showCycleTracker ? 1 : 0);
+
+  const tourSteps = [
+      {
+        popover: {
+          title: `Welcome to Amar Health, ${firstName}`,
+          description: "Quick 30-second look at what's here before you dive in.",
+        },
+      },
+      {
+        element: '[data-tour="home-notifications"]',
+        disableActiveInteraction: true,
+        popover: {
+          title: "Notifications",
+          description: "Reminders, blood-request matches, and other updates land here — the dot means something's unread.",
+        },
+      },
+      {
+        element: '[data-tour="home-widgets"]',
+        disableActiveInteraction: true,
+        popover: {
+          title: "Your quick glance",
+          description: "Swipe through cards for Blood Donation, your Vault, Reminders, Health Tracker" + (showCycleTracker ? ", and Cycle Tracker" : "") + " — each shows what's due right now.",
+        },
+      },
+      {
+        element: '[data-tour="home-explore"]',
+        disableActiveInteraction: true,
+        popover: {
+          title: `${featureCount} features, one tap away`,
+          description: "Health Tracker, Vault, Blood Donation, Hospitals, Find Care, Medicine, Family, Tests" + (showCycleTracker ? ", and Cycle Tracker" : "") + " — tap any tile to open it.",
+        },
+      },
+      {
+        element: '[data-tour="home-profile"]',
+        disableActiveInteraction: true,
+        popover: {
+          title: "Your profile",
+          description: "Settings, notification preferences, dark mode, and account management live here.",
+        },
+      },
+  ];
+
+  useAutoTour("home-overview", tourSteps, !isLoading);
 
   return (
     <div className="mx-auto w-full max-w-sm px-5 pt-8">
@@ -82,9 +128,18 @@ export default function HomeDashboardPage() {
           <h1 className="text-2xl font-bold">{firstName}</h1>
         </div>
         <div className="flex items-center gap-2">
+          <button
+            type="button"
+            aria-label="Replay app tour"
+            onClick={() => startTour("home-overview", tourSteps)}
+            className="tap-target rounded-full bg-primary-50 text-primary-700"
+          >
+            <HelpCircle size={20} aria-hidden="true" />
+          </button>
           <Link
             href="/notifications"
             aria-label="Notifications"
+            data-tour="home-notifications"
             className="tap-target relative rounded-full bg-primary-50 text-primary-700"
           >
             <Bell size={20} aria-hidden="true" />
@@ -95,6 +150,7 @@ export default function HomeDashboardPage() {
           <Link
             href="/profile"
             aria-label="Profile"
+            data-tour="home-profile"
             className="tap-target h-11 w-11 overflow-hidden rounded-full bg-primary-50 text-primary-700"
           >
             {user?.avatarUrl ? (
@@ -115,18 +171,22 @@ export default function HomeDashboardPage() {
         <HomeCarousel todayReminders={reminders} upcomingReminders={upcomingReminders} />
       )}
 
-      <HomeWidgetCarousel
-        vaultSummary={vaultSummary}
-        todayReminders={reminders}
-        upcomingReminders={upcomingReminders}
-        myActiveBloodRequests={myBloodRequestsQuery.data?.items ?? []}
-        cycleSummary={cycleSummaryQuery.data}
-        showCycleTracker={showCycleTracker}
-        healthInsights={healthInsightsQuery.data}
-      />
+      <div data-tour="home-widgets">
+        <HomeWidgetCarousel
+          vaultSummary={vaultSummary}
+          todayReminders={reminders}
+          upcomingReminders={upcomingReminders}
+          myActiveBloodRequests={myBloodRequestsQuery.data?.items ?? []}
+          cycleSummary={cycleSummaryQuery.data}
+          showCycleTracker={showCycleTracker}
+          healthInsights={healthInsightsQuery.data}
+        />
+      </div>
 
-      <h2 className="mb-3 mt-3 text-lg font-semibold">Explore</h2>
-      <ExploreGrid showCycleTracker={showCycleTracker} />
+      <div data-tour="home-explore">
+        <h2 className="mb-3 mt-3 text-lg font-semibold">Explore</h2>
+        <ExploreGrid showCycleTracker={showCycleTracker} />
+      </div>
     </div>
   );
 }

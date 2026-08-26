@@ -271,6 +271,53 @@
   }
 }
 
+/* driver.js product-tour popover — restyled to match the app's rounded,
+   pill-button aesthetic instead of its square default look. Class applied
+   via the `popoverClass` option in src/lib/tour.ts. */
+.amar-tour-popover.driver-popover {
+  border-radius: 20px;
+  padding: 18px;
+  background: rgb(var(--surface-color));
+  color: var(--color-ink-900);
+  font-family: var(--font-sans);
+  box-shadow: 0 20px 40px -12px rgb(0 0 0 / 0.35);
+}
+.amar-tour-popover .driver-popover-title {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--color-ink-900);
+}
+.amar-tour-popover .driver-popover-description {
+  font-size: 0.875rem;
+  color: var(--color-ink-900);
+  opacity: 0.75;
+}
+.amar-tour-popover .driver-popover-progress-text {
+  font-size: 0.75rem;
+  opacity: 0.6;
+}
+.amar-tour-popover .driver-popover-navigation-btns button {
+  border-radius: var(--radius-pill);
+  padding: 8px 16px;
+  font-weight: 600;
+  font-size: 0.8125rem;
+  border: none;
+  text-shadow: none;
+  background: var(--color-primary-600);
+  color: white;
+}
+.amar-tour-popover .driver-popover-prev-btn {
+  background: color-mix(in srgb, var(--color-primary-600) 12%, transparent);
+  color: var(--color-primary-600);
+}
+.amar-tour-popover .driver-popover-close-btn {
+  color: var(--color-ink-900);
+  opacity: 0.5;
+}
+.driver-active-element {
+  border-radius: 16px !important;
+}
+
 @keyframes stagger-in {
   from {
     opacity: 0;

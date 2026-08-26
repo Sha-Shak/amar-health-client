@@ -12,9 +12,10 @@ import { authApi } from "@/features/auth/api";
 import { bloodDonationApi } from "@/features/blood-donation/api";
 import { BLOOD_GROUPS, urgencyLabel, type BloodGroup, type BloodRequest } from "@/features/blood-donation/types";
 import { errorMessage } from "@/lib/error-message";
+import { startTour, useAutoTour } from "@/lib/tour";
 import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { formatDistanceToNow } from "date-fns";
-import { Droplets, ListChecks, MapPin, Plus, Trophy, Users } from "lucide-react";
+import { Droplets, HelpCircle, ListChecks, MapPin, Plus, Trophy, Users } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -89,11 +90,56 @@ export default function BloodDonationHubPage() {
   );
   const myRequests = myRequestsQuery.data?.items ?? [];
 
+  const tourSteps = [
+      {
+        popover: {
+          title: "Blood Donation, in short",
+          description: "Post a request when you need blood, or make yourself available to help someone else.",
+        },
+      },
+      {
+        element: '[data-tour="bd-card"]',
+        disableActiveInteraction: true,
+        popover: {
+          title: "Your donor profile",
+          description: "Your blood group, donation stats, and a switch to mark yourself available to donate.",
+        },
+      },
+      {
+        element: '[data-tour="bd-post"]',
+        disableActiveInteraction: true,
+        popover: {
+          title: "Need blood?",
+          description: "Post a request here — matching available donors get notified automatically.",
+        },
+      },
+      {
+        element: '[data-tour="bd-tabs"]',
+        disableActiveInteraction: true,
+        popover: {
+          title: "Requests, donors, leaderboard",
+          description: "Open requests near you, available donors by blood group, and top donors — all in one place.",
+        },
+      },
+  ];
+
+  useAutoTour("blood-donation-overview", tourSteps, !myRequestsQuery.isLoading);
+
   return (
     <div className="mx-auto w-full max-w-sm px-5 pt-8 pb-6">
-      <div className="mb-1 flex items-center gap-2">
-        <Droplets size={22} className="text-coral-600" aria-hidden="true" />
-        <h1 className="text-2xl font-bold">Blood Donation</h1>
+      <div className="mb-1 flex items-center justify-between gap-2">
+        <div className="flex items-center gap-2">
+          <Droplets size={22} className="text-coral-600" aria-hidden="true" />
+          <h1 className="text-2xl font-bold">Blood Donation</h1>
+        </div>
+        <button
+          type="button"
+          aria-label="Replay tour"
+          onClick={() => startTour("blood-donation-overview", tourSteps)}
+          className="tap-target rounded-full text-ink-500"
+        >
+          <HelpCircle size={20} aria-hidden="true" />
+        </button>
       </div>
       <p className="mb-6 text-sm text-ink-700">
         Find blood when you need it, or step up when someone else does.
@@ -127,7 +173,7 @@ export default function BloodDonationHubPage() {
         </div>
       )}
 
-      <div className="glass-panel space-y-4 p-5">
+      <div className="glass-panel space-y-4 p-5" data-tour="bd-card">
         <div className="flex items-center justify-between">
           <div>
             <p className="text-sm text-ink-500">Your blood group</p>
@@ -207,6 +253,7 @@ export default function BloodDonationHubPage() {
 
         <Link
           href="/blood-donation/requests/new"
+          data-tour="bd-post"
           className="tap-target flex w-full items-center justify-center gap-2 rounded-[var(--radius-pill)] bg-coral-600 py-3.5 font-semibold text-white"
         >
           <Plus size={18} aria-hidden="true" />
@@ -214,7 +261,7 @@ export default function BloodDonationHubPage() {
         </Link>
       </div>
 
-      <div className="glass-panel mt-5 mb-4 flex gap-1 p-1">
+      <div className="glass-panel mt-5 mb-4 flex gap-1 p-1" data-tour="bd-tabs">
         {TABS.map((t) => (
           <button
             key={t.value}

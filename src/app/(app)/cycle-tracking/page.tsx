@@ -4,6 +4,7 @@ import { CycleCalendar, monthKey } from "@/components/cycle-tracking/cycle-calen
 import { DayEditor } from "@/components/cycle-tracking/day-editor";
 import { cycleTrackingApi } from "@/features/cycle-tracking/api";
 import { phaseLabel } from "@/features/cycle-tracking/types";
+import { startTour, useAutoTour } from "@/lib/tour";
 import { useQuery } from "@tanstack/react-query";
 import { eachDayOfInterval, endOfMonth, format, isToday, parseISO, startOfMonth } from "date-fns";
 import {
@@ -12,6 +13,7 @@ import {
   ChevronLeft,
   ChevronRight,
   Droplets,
+  HelpCircle,
   Settings2,
   Stethoscope,
 } from "lucide-react";
@@ -65,6 +67,41 @@ export default function CycleTrackingPage() {
       : [];
   const ovulationDates = summary?.ovulationDate ? [parseISO(summary.ovulationDate)] : [];
 
+  const tourSteps = [
+      {
+        popover: {
+          title: "Cycle Tracker, in short",
+          description: "Log period days and symptoms to get predictions for your next period and fertile window.",
+        },
+      },
+      {
+        element: '[data-tour="ct-summary"]',
+        disableActiveInteraction: true,
+        popover: {
+          title: "Where you are in your cycle",
+          description: "Current phase and cycle day, plus your averages once you've logged a few cycles.",
+        },
+      },
+      {
+        element: '[data-tour="ct-calendar"]',
+        disableActiveInteraction: true,
+        popover: {
+          title: "Tap any day to log it",
+          description: "Mark period days and symptoms — the calendar also shows predicted period, fertile window, and ovulation.",
+        },
+      },
+      {
+        element: '[data-tour="ct-insights"]',
+        disableActiveInteraction: true,
+        popover: {
+          title: "Insights",
+          description: "Trends and patterns across your logged cycles once you have enough history.",
+        },
+      },
+  ];
+
+  useAutoTour("cycle-tracking-overview", tourSteps, summaryQuery.isFetched);
+
   return (
     <div className="mx-auto w-full max-w-sm px-5 pb-28 pt-6">
       <div className="mb-4 flex items-center justify-between">
@@ -81,9 +118,18 @@ export default function CycleTrackingPage() {
           Cycle Tracker
         </h1>
         <div className="-mr-2 flex items-center">
+          <button
+            type="button"
+            aria-label="Replay tour"
+            onClick={() => startTour("cycle-tracking-overview", tourSteps)}
+            className="tap-target rounded-full text-ink-700"
+          >
+            <HelpCircle size={20} aria-hidden="true" />
+          </button>
           <Link
             href="/cycle-tracking/insights"
             aria-label="Cycle insights"
+            data-tour="ct-insights"
             className="tap-target rounded-full text-ink-700"
           >
             <BarChart3 size={20} aria-hidden="true" />
@@ -98,7 +144,7 @@ export default function CycleTrackingPage() {
         </div>
       </div>
 
-      <div className="glass-panel-rose mb-5 space-y-3 p-5">
+      <div className="glass-panel-rose mb-5 space-y-3 p-5" data-tour="ct-summary">
         <div className="flex items-center gap-3">
           <span className="tap-target rounded-full bg-rose-50 text-rose-600">
             <Droplets size={18} aria-hidden="true" />
@@ -135,7 +181,7 @@ export default function CycleTrackingPage() {
         )}
       </div>
 
-      <div className="glass-panel mb-5 p-4">
+      <div className="glass-panel mb-5 p-4" data-tour="ct-calendar">
         <CycleCalendar
           month={month}
           onMonthChange={setMonth}
