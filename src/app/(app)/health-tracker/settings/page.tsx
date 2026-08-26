@@ -24,7 +24,7 @@ export default function HealthTrackerSettingsPage() {
   });
 
   return (
-    <div className="mx-auto w-full max-w-sm px-6 py-6">
+    <div className="mx-auto w-full max-w-sm px-6 pb-28 pt-6">
       <button
         type="button"
         onClick={() => router.back()}

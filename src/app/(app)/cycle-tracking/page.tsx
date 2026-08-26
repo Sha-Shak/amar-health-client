@@ -66,7 +66,7 @@ export default function CycleTrackingPage() {
   const ovulationDates = summary?.ovulationDate ? [parseISO(summary.ovulationDate)] : [];
 
   return (
-    <div className="mx-auto w-full max-w-sm px-5 py-6">
+    <div className="mx-auto w-full max-w-sm px-5 pb-28 pt-6">
       <div className="mb-4 flex items-center justify-between">
         <button
           type="button"

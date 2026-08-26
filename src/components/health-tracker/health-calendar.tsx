@@ -85,10 +85,14 @@ function HealthDayButton(props: DayButtonProps) {
       modifiers={modifiers}
       className={cn(
         "relative mx-auto flex h-10 w-10 items-center justify-center rounded-full text-sm font-medium transition-transform active:scale-90",
-        isGood && "bg-success-500/20 text-success-600 font-semibold",
-        isOk && "bg-amber-500/20 text-amber-700 font-semibold",
-        isTough && "bg-coral-500/20 text-coral-600 font-semibold",
-        isNeutralLogged && "bg-primary-100 text-primary-700 font-semibold",
+        // Solid fills with a fixed (non-theme-varying) text color, not a
+        // low-opacity tint + dark-shade text — the tint+dark-text combo
+        // reads fine on a light card but goes low-contrast on a dark one,
+        // since neither the tint nor the "700" text shade adapts per theme.
+        isGood && "bg-success-500 text-black font-semibold",
+        isOk && "bg-amber-500 text-black font-semibold",
+        isTough && "bg-coral-500 text-black font-semibold",
+        isNeutralLogged && "bg-primary-600 text-white font-semibold",
         !isLogged && "text-ink-900 hover:bg-surface-60",
         isSelected && "ring-2 ring-primary-600 ring-offset-2 ring-offset-transparent",
         isToday && !isSelected && "outline outline-1 outline-primary-500/50",

@@ -57,7 +57,7 @@ export default function HealthTrackerPage() {
   const isDue = !insightsQuery.data?.latestDate || (due && (isPast(due) || isToday(due)));
 
   return (
-    <div className="mx-auto w-full max-w-sm px-5 py-6">
+    <div className="mx-auto w-full max-w-sm px-5 pb-28 pt-6">
       <div className="mb-4 flex items-center justify-between">
         <button
           type="button"

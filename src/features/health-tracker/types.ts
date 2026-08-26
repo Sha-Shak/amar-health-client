@@ -7,6 +7,7 @@ export const METRIC_TYPES = [
   "stress",
   "sleep",
   "water",
+  "exercise",
   "screen_time",
 ] as const;
 export type MetricType = (typeof METRIC_TYPES)[number];
@@ -19,7 +20,8 @@ export const METRIC_META: Record<MetricType, { label: string; unit: string; desc
   mood: { label: "Mood", unit: "", description: "How you're feeling" },
   stress: { label: "Stress", unit: "", description: "Stress level" },
   sleep: { label: "Sleep", unit: "hrs", description: "Hours slept" },
-  water: { label: "Water", unit: "glasses", description: "Glasses of water" },
+  water: { label: "Water", unit: "L", description: "Water intake" },
+  exercise: { label: "Exercise", unit: "min", description: "Minutes of activity" },
   screen_time: { label: "Screen time", unit: "min", description: "Work, fun, and scrolling" },
 };
 
@@ -38,7 +40,8 @@ export type HealthLog = {
   mood?: number; // 1-5
   stress?: number; // 1-5
   sleepHours?: number;
-  waterGlasses?: number;
+  waterLiters?: number;
+  exerciseMinutes?: number;
   screenTimeWorkMinutes?: number;
   screenTimeEntertainmentMinutes?: number;
   screenTimeScrollingMinutes?: number;

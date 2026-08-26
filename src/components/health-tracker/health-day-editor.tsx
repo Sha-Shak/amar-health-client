@@ -2,15 +2,19 @@
 
 import { healthTrackerApi } from "@/features/health-tracker/api";
 import { MOOD_EMOJIS, STRESS_EMOJIS, type HealthLog, type MetricType } from "@/features/health-tracker/types";
+import { errorMessage } from "@/lib/error-message";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { format } from "date-fns";
-import { Trash2 } from "lucide-react";
+import { ChevronLeft, ChevronRight, Trash2 } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 
+type Step = { key: string; node: React.ReactNode };
+
 // Remounted via `key={date}` from the parent (same pattern as the Cycle
-// Tracker's DayEditor) so local draft state always starts fresh from that
-// day's existing log with no resync effect needed.
+// Tracker's DayEditor) so local draft state — including which step the
+// wizard is on — always starts fresh from that day's existing log, no
+// resync effect needed.
 export function HealthDayEditor({
   date,
   log,
@@ -34,11 +38,13 @@ export function HealthDayEditor({
   const [mood, setMood] = useState<number | undefined>(log?.mood);
   const [stress, setStress] = useState<number | undefined>(log?.stress);
   const [sleepHours, setSleepHours] = useState(log?.sleepHours?.toString() ?? "");
-  const [waterGlasses, setWaterGlasses] = useState(log?.waterGlasses ?? 0);
+  const [waterLiters, setWaterLiters] = useState(log?.waterLiters ?? 0);
+  const [exerciseMinutes, setExerciseMinutes] = useState(log?.exerciseMinutes ?? 0);
   const [screenWork, setScreenWork] = useState(log?.screenTimeWorkMinutes ?? 0);
   const [screenFun, setScreenFun] = useState(log?.screenTimeEntertainmentMinutes ?? 0);
   const [screenScroll, setScreenScroll] = useState(log?.screenTimeScrollingMinutes ?? 0);
   const [notes, setNotes] = useState(log?.notes ?? "");
+  const [stepIndex, setStepIndex] = useState(0);
 
   function invalidate() {
     queryClient.invalidateQueries({ queryKey: ["health-logs", monthKey] });
@@ -56,7 +62,8 @@ export function HealthDayEditor({
         mood,
         stress,
         sleepHours: sleepHours ? Number(sleepHours) : undefined,
-        waterGlasses: has("water") ? waterGlasses : undefined,
+        waterLiters: has("water") ? waterLiters : undefined,
+        exerciseMinutes: has("exercise") ? exerciseMinutes : undefined,
         screenTimeWorkMinutes: has("screen_time") ? screenWork : undefined,
         screenTimeEntertainmentMinutes: has("screen_time") ? screenFun : undefined,
         screenTimeScrollingMinutes: has("screen_time") ? screenScroll : undefined,
@@ -66,6 +73,7 @@ export function HealthDayEditor({
       invalidate();
       toast.success(`Saved ${format(date, "MMM d")}`);
     },
+    onError: (error) => toast.error(errorMessage(error)),
   });
 
   const deleteMutation = useMutation({
@@ -74,37 +82,25 @@ export function HealthDayEditor({
       invalidate();
       toast("Cleared this day");
     },
+    onError: (error) => toast.error(errorMessage(error)),
   });
 
-  return (
-    <div className="glass-panel space-y-5 p-5">
-      <div className="flex items-center justify-between">
-        <p className="font-semibold text-ink-900">{format(date, "EEEE, MMM d")}</p>
-        {log && (
-          <button
-            type="button"
-            onClick={() => deleteMutation.mutate()}
-            disabled={deleteMutation.isPending}
-            aria-label="Clear this day's log"
-            className="tap-target rounded-full text-ink-500 hover:text-coral-600"
-          >
-            <Trash2 size={16} aria-hidden="true" />
-          </button>
-        )}
-      </div>
-
-      {has("mood") && (
-        <EmojiScale label="Mood" emojis={MOOD_EMOJIS} value={mood} onChange={setMood} />
-      )}
-      {has("stress") && (
-        <EmojiScale label="Stress" emojis={STRESS_EMOJIS} value={stress} onChange={setStress} />
-      )}
-
-      {has("weight") && (
-        <NumberField label="Weight" unit="kg" value={weightKg} onChange={setWeightKg} step="0.1" />
-      )}
-
-      {has("blood_pressure") && (
+  const steps: Step[] = [
+    has("mood") && {
+      key: "mood",
+      node: <EmojiScale label="How's your mood?" emojis={MOOD_EMOJIS} value={mood} onChange={setMood} />,
+    },
+    has("stress") && {
+      key: "stress",
+      node: <EmojiScale label="How stressed are you?" emojis={STRESS_EMOJIS} value={stress} onChange={setStress} />,
+    },
+    has("weight") && {
+      key: "weight",
+      node: <NumberField label="Weight" unit="kg" value={weightKg} onChange={setWeightKg} step="0.1" />,
+    },
+    has("blood_pressure") && {
+      key: "blood_pressure",
+      node: (
         <div className="space-y-1.5">
           <p className="text-sm font-medium text-ink-700">Blood pressure (mmHg)</p>
           <div className="flex items-center gap-2">
@@ -125,54 +121,188 @@ export function HealthDayEditor({
             />
           </div>
         </div>
-      )}
-
-      {has("blood_glucose") && (
-        <NumberField label="Blood glucose" unit="mg/dL" value={bloodGlucose} onChange={setBloodGlucose} />
-      )}
-
-      {has("heart_rate") && (
-        <NumberField label="Heart rate" unit="bpm" value={heartRate} onChange={setHeartRate} />
-      )}
-
-      {has("sleep") && (
-        <NumberField label="Sleep" unit="hrs" value={sleepHours} onChange={setSleepHours} step="0.5" />
-      )}
-
-      {has("water") && (
-        <SliderField label="Water" unit="glasses" value={waterGlasses} onChange={setWaterGlasses} min={0} max={15} />
-      )}
-
-      {has("screen_time") && (
-        <div className="space-y-3">
-          <p className="text-sm font-medium text-ink-700">Screen time (minutes)</p>
-          <SliderField label="Work" value={screenWork} onChange={setScreenWork} min={0} max={600} step={15} />
-          <SliderField label="Entertainment" value={screenFun} onChange={setScreenFun} min={0} max={600} step={15} />
-          <SliderField label="Doomscrolling" value={screenScroll} onChange={setScreenScroll} min={0} max={600} step={15} />
-        </div>
-      )}
-
-      <div className="space-y-1.5">
-        <label htmlFor="health-notes" className="text-sm font-medium text-ink-700">
-          Notes (optional)
-        </label>
-        <textarea
-          id="health-notes"
-          value={notes}
-          onChange={(e) => setNotes(e.target.value)}
-          rows={2}
-          className="w-full rounded-[var(--radius-sm)] border border-primary-400/30 bg-surface-70 px-4 py-3 text-ink-900 outline-none focus:border-primary-600/40 focus:ring-2 focus:ring-primary-600/30"
+      ),
+    },
+    has("blood_glucose") && {
+      key: "blood_glucose",
+      node: <NumberField label="Blood glucose" unit="mg/dL" value={bloodGlucose} onChange={setBloodGlucose} />,
+    },
+    has("heart_rate") && {
+      key: "heart_rate",
+      node: <NumberField label="Heart rate" unit="bpm" value={heartRate} onChange={setHeartRate} />,
+    },
+    has("sleep") && {
+      key: "sleep",
+      node: <NumberField label="Sleep" unit="hrs" value={sleepHours} onChange={setSleepHours} step="0.5" />,
+    },
+    has("water") && {
+      key: "water",
+      node: (
+        <SliderField label="Water" unit="L" value={waterLiters} onChange={setWaterLiters} min={0} max={6} step={0.25} />
+      ),
+    },
+    has("exercise") && {
+      key: "exercise",
+      node: (
+        <SliderField
+          label="Exercise"
+          unit="min"
+          value={exerciseMinutes}
+          onChange={setExerciseMinutes}
+          min={0}
+          max={180}
+          step={5}
         />
+      ),
+    },
+    has("screen_time") && {
+      key: "screen_time",
+      node: (
+        <div>
+          <p className="mb-2 text-sm font-medium text-ink-700">Screen time (minutes)</p>
+          <div className="space-y-4">
+            <SliderField label="Work" value={screenWork} onChange={setScreenWork} min={0} max={600} step={15} compact />
+            <SliderField
+              label="Entertainment"
+              value={screenFun}
+              onChange={setScreenFun}
+              min={0}
+              max={600}
+              step={15}
+              compact
+            />
+            <SliderField
+              label="Doomscrolling"
+              value={screenScroll}
+              onChange={setScreenScroll}
+              min={0}
+              max={600}
+              step={15}
+              compact
+            />
+          </div>
+        </div>
+      ),
+    },
+    {
+      key: "notes",
+      node: (
+        <div className="space-y-1.5">
+          <label htmlFor="health-notes" className="text-sm font-medium text-ink-700">
+            Anything else? (optional)
+          </label>
+          <textarea
+            id="health-notes"
+            value={notes}
+            onChange={(e) => setNotes(e.target.value)}
+            rows={3}
+            autoFocus
+            className="w-full rounded-[var(--radius-sm)] border border-primary-400/30 bg-surface-70 px-4 py-3 text-ink-900 outline-none focus:border-primary-600/40 focus:ring-2 focus:ring-primary-600/30"
+          />
+        </div>
+      ),
+    },
+  ].filter(Boolean) as Step[];
+
+  const clampedIndex = Math.min(stepIndex, steps.length - 1);
+  const isLastStep = clampedIndex === steps.length - 1;
+  const remaining = steps.length - 1 - clampedIndex;
+
+  function goNext() {
+    if (isLastStep) {
+      saveMutation.mutate();
+      return;
+    }
+    setStepIndex((i) => Math.min(i + 1, steps.length - 1));
+  }
+
+  function goBack() {
+    setStepIndex((i) => Math.max(i - 1, 0));
+  }
+
+  return (
+    <div className="glass-panel space-y-5 overflow-hidden p-5">
+      <div className="flex items-center justify-between">
+        <p className="font-semibold text-ink-900">{format(date, "EEEE, MMM d")}</p>
+        {log && (
+          <button
+            type="button"
+            onClick={() => deleteMutation.mutate()}
+            disabled={deleteMutation.isPending}
+            aria-label="Clear this day's log"
+            className="tap-target rounded-full text-ink-500 hover:text-coral-600"
+          >
+            <Trash2 size={16} aria-hidden="true" />
+          </button>
+        )}
       </div>
 
-      <button
-        type="button"
-        onClick={() => saveMutation.mutate()}
-        disabled={saveMutation.isPending}
-        className="tap-target w-full rounded-[var(--radius-pill)] bg-primary-600 font-semibold text-white disabled:opacity-60"
-      >
-        {saveMutation.isPending ? "Saving…" : "Save"}
-      </button>
+      {/* Progress dots double as a jump-to-step control — tapping one skips
+          straight there, which matters once there are 8+ steps and someone
+          wants to fix an earlier answer without stepping back through all
+          of them. */}
+      <div className="flex items-center justify-center gap-1.5">
+        {steps.map((s, i) => (
+          <button
+            key={s.key}
+            type="button"
+            onClick={() => setStepIndex(i)}
+            aria-label={`Go to step ${i + 1}`}
+            className={`h-1.5 rounded-full transition-all ${
+              i === clampedIndex ? "w-6 bg-primary-600" : "w-1.5 bg-primary-600/25"
+            }`}
+          />
+        ))}
+      </div>
+      <p className="-mt-3 text-center text-xs text-ink-500">
+        {remaining === 0 ? "Last one" : `${remaining} more after this`}
+      </p>
+
+      {/* key={clampedIndex} gives each step a quick fade/slide-in so moving
+          through the wizard has some motion to it instead of an abrupt
+          content swap. */}
+      <div key={clampedIndex} className="animate-stagger-in" style={{ minHeight: "6rem" }}>
+        {steps[clampedIndex]?.node}
+      </div>
+
+      {saveMutation.isError && (
+        <p className="text-sm text-coral-600">{errorMessage(saveMutation.error)}</p>
+      )}
+      {deleteMutation.isError && (
+        <p className="text-sm text-coral-600">{errorMessage(deleteMutation.error)}</p>
+      )}
+
+      <div className="flex items-center gap-2">
+        {clampedIndex > 0 && (
+          <button
+            type="button"
+            onClick={goBack}
+            aria-label="Previous"
+            className="tap-target rounded-full bg-surface-60 text-ink-700"
+          >
+            <ChevronLeft size={20} aria-hidden="true" />
+          </button>
+        )}
+        <button
+          type="button"
+          onClick={goNext}
+          disabled={saveMutation.isPending}
+          className="tap-target flex flex-1 items-center justify-center gap-1.5 rounded-[var(--radius-pill)] bg-primary-600 font-semibold text-white disabled:opacity-60"
+        >
+          {isLastStep ? (
+            saveMutation.isPending ? (
+              "Saving…"
+            ) : (
+              "Save"
+            )
+          ) : (
+            <>
+              Next
+              <ChevronRight size={18} aria-hidden="true" />
+            </>
+          )}
+        </button>
+      </div>
     </div>
   );
 }
@@ -207,10 +337,7 @@ function EmojiScale({
           value={level}
           onChange={(e) => onChange(Number(e.target.value))}
           aria-label={label}
-          className="h-2 w-full appearance-none rounded-full outline-none [&::-webkit-slider-thumb]:h-5 [&::-webkit-slider-thumb]:w-5 [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:border-2 [&::-webkit-slider-thumb]:border-white [&::-webkit-slider-thumb]:bg-primary-600 [&::-webkit-slider-thumb]:shadow [&::-moz-range-thumb]:h-5 [&::-moz-range-thumb]:w-5 [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:border-2 [&::-moz-range-thumb]:border-white [&::-moz-range-thumb]:bg-primary-600"
-          style={{
-            background: "linear-gradient(to right, var(--color-coral-500), var(--color-amber-500), var(--color-success-500))",
-          }}
+          className="h-2 w-full accent-primary-600"
         />
         {value == null && <p className="mt-1 text-xs text-ink-500">Drag to set</p>}
       </div>
@@ -241,6 +368,7 @@ function NumberField({
         step={step}
         value={value}
         onChange={(e) => onChange(e.target.value)}
+        autoFocus
         className="w-full rounded-[var(--radius-sm)] border border-primary-400/30 bg-surface-70 px-4 py-3 text-ink-900 outline-none focus:border-primary-600/40 focus:ring-2 focus:ring-primary-600/30"
       />
     </div>
@@ -255,6 +383,7 @@ function SliderField({
   min,
   max,
   step = 1,
+  compact = false,
 }: {
   label: string;
   unit?: string;
@@ -263,11 +392,12 @@ function SliderField({
   min: number;
   max: number;
   step?: number;
+  compact?: boolean;
 }) {
   return (
     <div className="space-y-1">
       <div className="flex items-center justify-between text-sm">
-        <span className="font-medium text-ink-700">{label}</span>
+        <span className={compact ? "text-ink-700" : "font-medium text-ink-700"}>{label}</span>
         <span className="font-semibold text-primary-700">
           {value}
           {unit ? ` ${unit}` : ""}
@@ -280,6 +410,7 @@ function SliderField({
         step={step}
         value={value}
         onChange={(e) => onChange(Number(e.target.value))}
+        aria-label={label}
         className="w-full accent-primary-600"
       />
     </div>
