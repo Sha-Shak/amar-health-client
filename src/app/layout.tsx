@@ -29,7 +29,12 @@ export const viewport: Viewport = {
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html lang="en" data-theme="light" className="h-full antialiased">
-      <body className="min-h-full flex flex-col">
+      {/* suppressHydrationWarning here only silences attribute-mismatch
+          noise from browser extensions (Grammarly, ColorZilla, etc.) that
+          inject their own attributes onto <body> before React hydrates —
+          it does not suppress hydration warnings for anything React itself
+          renders inside the tree. */}
+      <body className="min-h-full flex flex-col" suppressHydrationWarning>
         <AppProviders>{children}</AppProviders>
       </body>
     </html>

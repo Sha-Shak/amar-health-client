@@ -10,6 +10,9 @@ const nextConfig: NextConfig = {
       { protocol: "https", hostname: "amar-health.onrender.com" },
       // Bulk-imported doctor/hospital photos (§7.5's sasthyaSebaImport.ts).
       { protocol: "https", hostname: "img.sasthyaseba.com" },
+      // Google-account avatars — a Google-signup user's avatarUrl points
+      // here directly (never proxied through our own backend).
+      { protocol: "https", hostname: "lh3.googleusercontent.com" },
     ],
   },
 };
