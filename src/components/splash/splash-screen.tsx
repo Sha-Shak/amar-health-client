@@ -1,35 +1,36 @@
 "use client";
 
-import { HeartPulse, Pill, Stethoscope } from "lucide-react";
+import { Droplets, FolderHeart, Pill, Stethoscope } from "lucide-react";
 import { useEffect, useState } from "react";
 
-// Three medical glyphs cycle quickly, then the wordmark lands and the whole
-// screen fades away — ~700ms total, once per full page load. A route change
-// doesn't remount this (it lives above the router in the provider tree), so
-// it never re-appears on plain in-app navigation.
-const ICONS = [Stethoscope, Pill, HeartPulse];
-const ICON_STEP_MS = 220;
-const HOLD_MS = 260;
-const FADE_MS = 220;
+// A two-beat launch sequence, once per full page load (this lives above the
+// router in the provider tree, so an in-app navigation never remounts it):
+// the app's feature icons wave in a row, then they hand off to the wordmark
+// growing in, then the whole thing fades. ~1.6s total.
+const FEATURE_ICONS = [Stethoscope, Pill, FolderHeart, Droplets];
+const ICON_STAGGER_MS = 90;
+const ICON_PHASE_MS = 820;
+const TITLE_GROW_MS = 420;
+const HOLD_MS = 320;
+const FADE_MS = 240;
+
+type Phase = "icons" | "title" | "fading";
 
 export function SplashScreen() {
-  const [iconIndex, setIconIndex] = useState(0);
+  const [phase, setPhase] = useState<Phase>("icons");
   const [visible, setVisible] = useState(true);
-  const [fading, setFading] = useState(false);
 
   useEffect(() => {
-    if (iconIndex >= ICONS.length - 1) return;
-    const timer = setTimeout(() => setIconIndex((i) => i + 1), ICON_STEP_MS);
-    return () => clearTimeout(timer);
-  }, [iconIndex]);
-
-  useEffect(() => {
-    const cycleDone = ICONS.length * ICON_STEP_MS;
-    const fadeTimer = setTimeout(() => setFading(true), cycleDone + HOLD_MS);
-    const hideTimer = setTimeout(() => setVisible(false), cycleDone + HOLD_MS + FADE_MS);
+    const toTitle = setTimeout(() => setPhase("title"), ICON_PHASE_MS);
+    const toFading = setTimeout(() => setPhase("fading"), ICON_PHASE_MS + TITLE_GROW_MS + HOLD_MS);
+    const toHidden = setTimeout(
+      () => setVisible(false),
+      ICON_PHASE_MS + TITLE_GROW_MS + HOLD_MS + FADE_MS,
+    );
     return () => {
-      clearTimeout(fadeTimer);
-      clearTimeout(hideTimer);
+      clearTimeout(toTitle);
+      clearTimeout(toFading);
+      clearTimeout(toHidden);
     };
   }, []);
 
@@ -38,40 +39,45 @@ export function SplashScreen() {
   return (
     <div
       aria-hidden="true"
-      className="splash-bg fixed inset-0 z-[100] flex flex-col items-center justify-center gap-4"
+      className="splash-bg fixed inset-0 z-[100] flex items-center justify-center"
       style={{
-        opacity: fading ? 0 : 1,
+        opacity: phase === "fading" ? 0 : 1,
         transition: `opacity ${FADE_MS}ms ease-out`,
-        pointerEvents: fading ? "none" : "auto",
       }}
     >
-      <div className="relative flex h-16 w-16 items-center justify-center">
-        {ICONS.map((IconGlyph, i) => (
-          <IconGlyph
-            key={i}
-            size={44}
-            strokeWidth={1.75}
-            className="absolute text-primary-600 transition-all duration-200 ease-out"
-            style={{
-              opacity: i === iconIndex ? 1 : 0,
-              transform: i === iconIndex ? "scale(1)" : "scale(0.75)",
-            }}
-          />
-        ))}
-      </div>
-
-      <p className="text-3xl font-bold tracking-tight">
-        <span
-          style={{
-            color: "#ffffff",
-            WebkitTextStroke: "1.4px var(--color-primary-600)",
-            paintOrder: "stroke fill",
-          }}
+      {phase === "icons" ? (
+        <div className="flex items-center gap-5">
+          {FEATURE_ICONS.map((Icon, i) => (
+            <Icon
+              key={i}
+              size={34}
+              strokeWidth={1.75}
+              className="text-primary-600"
+              style={{
+                animation: "splash-icon-wave 620ms ease-in-out",
+                animationDelay: `${i * ICON_STAGGER_MS}ms`,
+                animationFillMode: "both",
+              }}
+            />
+          ))}
+        </div>
+      ) : (
+        <p
+          className="whitespace-nowrap text-4xl font-bold tracking-tight"
+          style={{ animation: `splash-title-grow ${TITLE_GROW_MS}ms cubic-bezier(0.22, 1, 0.36, 1) both` }}
         >
-          Amar
-        </span>{" "}
-        <span className="text-primary-600">Health</span>
-      </p>
+          <span
+            style={{
+              color: "#ffffff",
+              WebkitTextStroke: "1.4px var(--color-primary-600)",
+              paintOrder: "stroke fill",
+            }}
+          >
+            Amar
+          </span>{" "}
+          <span className="text-primary-600">Health</span>
+        </p>
+      )}
     </div>
   );
 }

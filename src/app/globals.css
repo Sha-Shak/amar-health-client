@@ -177,27 +177,44 @@
     border-radius: var(--radius-card);
   }
 
-  /* Splash screen background — a real brand gradient (teal → white) in light
-     mode, distinct from the very subtle page-background tint elsewhere, so
-     the launch moment reads as branded rather than blank. Dark mode keeps
-     the app's usual near-black gradient instead of the teal one — a bright
-     teal wash would clash with everything else being dark. */
+  /* Splash screen background — deliberately just the app's own page-background
+     gradient (same tokens body uses in the @layer base rule above), not a
+     separate branded treatment. A vivid teal wash was tried here and read as
+     too loud for a moment that's meant to be quick and quiet. */
   .splash-bg {
     background: linear-gradient(
-      160deg,
-      var(--color-primary-500) 0%,
-      var(--color-primary-100) 48%,
-      #ffffff 88%
-    );
-  }
-
-  :root[data-theme="dark"] .splash-bg {
-    background: linear-gradient(
-      160deg,
+      to top left,
       var(--page-bg-from) 0%,
       var(--page-bg-via) 55%,
       var(--page-bg-to) 100%
     );
+  }
+
+  @keyframes splash-icon-wave {
+    0%,
+    100% {
+      transform: translateY(0);
+      opacity: 0.55;
+    }
+    50% {
+      transform: translateY(-10px);
+      opacity: 1;
+    }
+  }
+
+  @keyframes splash-title-grow {
+    0% {
+      transform: scale(0.55);
+      opacity: 0;
+    }
+    70% {
+      transform: scale(1.06);
+      opacity: 1;
+    }
+    100% {
+      transform: scale(1);
+      opacity: 1;
+    }
   }
 
   .glass-on-photo {

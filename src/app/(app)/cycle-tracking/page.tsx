@@ -6,7 +6,7 @@ import { cycleTrackingApi } from "@/features/cycle-tracking/api";
 import { phaseLabel } from "@/features/cycle-tracking/types";
 import { useQuery } from "@tanstack/react-query";
 import { eachDayOfInterval, endOfMonth, format, isToday, parseISO, startOfMonth } from "date-fns";
-import { CalendarHeart, ChevronLeft, Droplets, Settings2 } from "lucide-react";
+import { CalendarHeart, ChevronLeft, ChevronRight, Droplets, Settings2, Stethoscope } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -151,6 +151,20 @@ export default function CycleTrackingPage() {
       </div>
 
       <DayEditor key={selectedDateStr} date={selectedDate} log={selectedLog} monthKey={monthStr} />
+
+      <Link
+        href="/find-care?specialty=gynecology"
+        className="glass-panel-rose mt-5 flex items-center gap-3 p-4 transition-transform duration-100 active:scale-[0.98]"
+      >
+        <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-rose-50 text-rose-600">
+          <Stethoscope size={20} aria-hidden="true" />
+        </span>
+        <span className="min-w-0 flex-1">
+          <span className="block font-semibold text-ink-900">Find a Gynecologist</span>
+          <span className="block text-sm text-ink-500">Talk to a specialist about your cycle</span>
+        </span>
+        <ChevronRight size={18} className="shrink-0 text-ink-500" aria-hidden="true" />
+      </Link>
     </div>
   );
 }
