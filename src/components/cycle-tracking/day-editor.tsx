@@ -12,9 +12,36 @@ import {
 } from "@/features/cycle-tracking/types";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { format } from "date-fns";
-import { Trash2 } from "lucide-react";
+import { Battery, Droplets, Gauge, NotebookPen, Smile, Sparkles, Trash2 } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
+
+// Each visually distinct block below — Period, Symptoms, Mood, Pain, Energy,
+// Notes — is its own bordered/tinted sub-card with an icon+title header, not
+// just a label over a row of chips. Flat, undifferentiated fields were the
+// exact complaint this replaced: "symptom and all those things" blended
+// together with no visual separation.
+function Section({
+  icon: Icon,
+  title,
+  tint,
+  children,
+}: {
+  icon: React.ElementType;
+  title: string;
+  tint: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <div className={`space-y-3 rounded-[var(--radius-sm)] border border-black/5 p-4 ${tint}`}>
+      <div className="flex items-center gap-2">
+        <Icon size={16} className="shrink-0 text-ink-700" aria-hidden="true" />
+        <p className="text-sm font-semibold text-ink-900">{title}</p>
+      </div>
+      {children}
+    </div>
+  );
+}
 
 // Remounted (via `key={date}` from the parent) whenever the selected date
 // changes, so its local draft state always starts fresh from that day's
@@ -73,7 +100,7 @@ export function DayEditor({ date, log, monthKey }: { date: Date; log: CycleLog |
   }
 
   return (
-    <div className="glass-panel space-y-5 p-5">
+    <div className="glass-panel space-y-4 p-5">
       <div className="flex items-center justify-between">
         <p className="font-semibold text-ink-900">{format(date, "EEEE, MMM d")}</p>
         {log && (
@@ -89,41 +116,42 @@ export function DayEditor({ date, log, monthKey }: { date: Date; log: CycleLog |
         )}
       </div>
 
-      <button
-        type="button"
-        onClick={() => setIsPeriodDay((v) => !v)}
-        className={`flex w-full items-center justify-between rounded-[var(--radius-sm)] px-4 py-3 text-sm font-semibold transition-colors ${
-          isPeriodDay ? "bg-rose-500 text-white" : "bg-surface-60 text-ink-700"
-        }`}
-      >
-        Period day
-        <span
-          className={`h-5 w-5 rounded-full border-2 ${isPeriodDay ? "border-white bg-white/30" : "border-ink-500/30"}`}
-        />
-      </button>
+      <Section icon={Droplets} title="Period" tint="bg-rose-500/5">
+        <button
+          type="button"
+          onClick={() => setIsPeriodDay((v) => !v)}
+          className={`flex w-full items-center justify-between rounded-[var(--radius-sm)] px-4 py-3 text-sm font-semibold transition-colors ${
+            isPeriodDay ? "bg-rose-500 text-white" : "bg-surface-60 text-ink-700"
+          }`}
+        >
+          Period day
+          <span
+            className={`h-5 w-5 rounded-full border-2 ${isPeriodDay ? "border-white bg-white/30" : "border-ink-500/30"}`}
+          />
+        </button>
 
-      {isPeriodDay && (
-        <div className="space-y-1.5">
-          <p className="text-sm font-medium text-ink-700">Flow</p>
-          <div className="flex gap-2">
-            {FLOW_LEVELS.map((level) => (
-              <button
-                key={level}
-                type="button"
-                onClick={() => setFlow(level)}
-                className={`tap-target flex-1 rounded-[var(--radius-pill)] px-2 text-xs font-medium capitalize ${
-                  flow === level ? "bg-rose-500 text-white" : "bg-surface-60 text-ink-700"
-                }`}
-              >
-                {level}
-              </button>
-            ))}
+        {isPeriodDay && (
+          <div className="space-y-1.5 pt-1">
+            <p className="text-xs font-medium text-ink-500">Flow</p>
+            <div className="flex gap-2">
+              {FLOW_LEVELS.map((level) => (
+                <button
+                  key={level}
+                  type="button"
+                  onClick={() => setFlow(level)}
+                  className={`tap-target flex-1 rounded-[var(--radius-pill)] px-2 text-xs font-medium capitalize ${
+                    flow === level ? "bg-rose-500 text-white" : "bg-surface-70 text-ink-700"
+                  }`}
+                >
+                  {level}
+                </button>
+              ))}
+            </div>
           </div>
-        </div>
-      )}
+        )}
+      </Section>
 
-      <div className="space-y-1.5">
-        <p className="text-sm font-medium text-ink-700">Symptoms</p>
+      <Section icon={Sparkles} title="Symptoms" tint="bg-primary-600/5">
         <div className="flex flex-wrap gap-2">
           {SYMPTOMS.map((s) => (
             <button
@@ -131,17 +159,16 @@ export function DayEditor({ date, log, monthKey }: { date: Date; log: CycleLog |
               type="button"
               onClick={() => toggleSymptom(s)}
               className={`tap-target rounded-[var(--radius-pill)] px-3 text-sm font-medium ${
-                symptoms.includes(s) ? "bg-primary-600 text-white" : "bg-surface-60 text-ink-700"
+                symptoms.includes(s) ? "bg-primary-600 text-white" : "bg-surface-70 text-ink-700"
               }`}
             >
               {s}
             </button>
           ))}
         </div>
-      </div>
+      </Section>
 
-      <div className="space-y-1.5">
-        <p className="text-sm font-medium text-ink-700">Mood</p>
+      <Section icon={Smile} title="Mood" tint="bg-primary-600/5">
         <div className="flex flex-wrap gap-2">
           {MOODS.map((m) => (
             <button
@@ -149,19 +176,19 @@ export function DayEditor({ date, log, monthKey }: { date: Date; log: CycleLog |
               type="button"
               onClick={() => setMood((prev) => (prev === m ? undefined : m))}
               className={`tap-target rounded-[var(--radius-pill)] px-3 text-sm font-medium ${
-                mood === m ? "bg-primary-600 text-white" : "bg-surface-60 text-ink-700"
+                mood === m ? "bg-primary-600 text-white" : "bg-surface-70 text-ink-700"
               }`}
             >
               {m}
             </button>
           ))}
         </div>
-      </div>
+      </Section>
 
-      <div className="space-y-1.5">
+      <Section icon={Gauge} title="Pain level" tint="bg-rose-500/5">
         <div className="flex items-center justify-between">
-          <label htmlFor="cycle-pain" className="text-sm font-medium text-ink-700">
-            Pain level
+          <label htmlFor="cycle-pain" className="text-xs font-medium text-ink-500">
+            0 = none, 10 = severe
           </label>
           <span className="text-sm font-semibold text-rose-600">
             {painLevel != null ? painLevel : "—"}
@@ -181,10 +208,9 @@ export function DayEditor({ date, log, monthKey }: { date: Date; log: CycleLog |
           <span>No pain</span>
           <span>Severe</span>
         </div>
-      </div>
+      </Section>
 
-      <div className="space-y-1.5">
-        <p className="text-sm font-medium text-ink-700">Energy</p>
+      <Section icon={Battery} title="Energy" tint="bg-primary-600/5">
         <div className="flex gap-2">
           {ENERGY_LEVELS.map((level) => (
             <button
@@ -192,27 +218,26 @@ export function DayEditor({ date, log, monthKey }: { date: Date; log: CycleLog |
               type="button"
               onClick={() => setEnergyLevel((prev) => (prev === level ? undefined : level))}
               className={`tap-target flex-1 rounded-[var(--radius-pill)] px-2 text-sm font-medium capitalize ${
-                energyLevel === level ? "bg-primary-600 text-white" : "bg-surface-60 text-ink-700"
+                energyLevel === level ? "bg-primary-600 text-white" : "bg-surface-70 text-ink-700"
               }`}
             >
               {level}
             </button>
           ))}
         </div>
-      </div>
+      </Section>
 
-      <div className="space-y-1.5">
-        <label htmlFor="cycle-notes" className="text-sm font-medium text-ink-700">
-          Notes (optional)
-        </label>
+      <Section icon={NotebookPen} title="Notes" tint="bg-surface-60/60">
         <textarea
           id="cycle-notes"
+          aria-label="Notes"
           value={notes}
           onChange={(e) => setNotes(e.target.value)}
           rows={2}
+          placeholder="Optional — anything else worth remembering about today"
           className="w-full rounded-[var(--radius-sm)] border border-primary-400/30 bg-surface-70 px-4 py-3 text-ink-900 outline-none focus:border-primary-600/40 focus:ring-2 focus:ring-primary-600/30"
         />
-      </div>
+      </Section>
 
       <button
         type="button"
