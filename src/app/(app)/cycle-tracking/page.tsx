@@ -6,7 +6,15 @@ import { cycleTrackingApi } from "@/features/cycle-tracking/api";
 import { phaseLabel } from "@/features/cycle-tracking/types";
 import { useQuery } from "@tanstack/react-query";
 import { eachDayOfInterval, endOfMonth, format, isToday, parseISO, startOfMonth } from "date-fns";
-import { CalendarHeart, ChevronLeft, ChevronRight, Droplets, Settings2, Stethoscope } from "lucide-react";
+import {
+  BarChart3,
+  CalendarHeart,
+  ChevronLeft,
+  ChevronRight,
+  Droplets,
+  Settings2,
+  Stethoscope,
+} from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -72,13 +80,22 @@ export default function CycleTrackingPage() {
           <CalendarHeart size={20} className="text-rose-600" aria-hidden="true" />
           Cycle Tracker
         </h1>
-        <Link
-          href="/cycle-tracking/settings"
-          aria-label="Cycle settings"
-          className="tap-target -mr-2 rounded-full text-ink-700"
-        >
-          <Settings2 size={20} aria-hidden="true" />
-        </Link>
+        <div className="-mr-2 flex items-center">
+          <Link
+            href="/cycle-tracking/insights"
+            aria-label="Cycle insights"
+            className="tap-target rounded-full text-ink-700"
+          >
+            <BarChart3 size={20} aria-hidden="true" />
+          </Link>
+          <Link
+            href="/cycle-tracking/settings"
+            aria-label="Cycle settings"
+            className="tap-target rounded-full text-ink-700"
+          >
+            <Settings2 size={20} aria-hidden="true" />
+          </Link>
+        </div>
       </div>
 
       <div className="glass-panel-rose mb-5 space-y-3 p-5">

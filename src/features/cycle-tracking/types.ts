@@ -1,6 +1,9 @@
 export const FLOW_LEVELS = ["spotting", "light", "medium", "heavy"] as const;
 export type FlowLevel = (typeof FLOW_LEVELS)[number];
 
+export const ENERGY_LEVELS = ["low", "medium", "high"] as const;
+export type EnergyLevel = (typeof ENERGY_LEVELS)[number];
+
 export const SYMPTOMS = [
   "Cramps",
   "Headache",
@@ -26,6 +29,8 @@ export type CycleLog = {
   symptoms?: string[];
   mood?: string;
   notes?: string;
+  painLevel?: number;
+  energyLevel?: EnergyLevel;
 };
 
 export type CycleSettings = {
@@ -46,6 +51,22 @@ export type CycleSummary = {
   daysUntilNextPeriod: number | null;
   phase: CyclePhase | null;
   cyclesLogged: number;
+};
+
+export type CycleHistoryEntry = {
+  start: string;
+  periodLength: number;
+  cycleLength: number | null;
+};
+
+export type LabelCount = { label: string; count: number };
+
+export type CycleInsights = {
+  recentCycles: CycleHistoryEntry[];
+  topSymptoms: LabelCount[];
+  topMoods: LabelCount[];
+  avgPainLevel: number | null;
+  cyclesConsidered: number;
 };
 
 export function phaseLabel(phase: CyclePhase | null): string {

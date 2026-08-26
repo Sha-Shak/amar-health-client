@@ -1,8 +1,10 @@
 import { api } from "@/lib/api-client";
-import type { CycleLog, CycleSettings, CycleSummary } from "./types";
+import type { CycleInsights, CycleLog, CycleSettings, CycleSummary } from "./types";
 
 export const cycleTrackingApi = {
   getSummary: () => api.get<CycleSummary>("/cycle-tracking/summary"),
+
+  getInsights: () => api.get<CycleInsights>("/cycle-tracking/insights"),
 
   getSettings: () => api.get<CycleSettings>("/cycle-tracking/settings"),
 

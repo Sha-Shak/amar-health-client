@@ -1,7 +1,15 @@
 "use client";
 
 import { cycleTrackingApi } from "@/features/cycle-tracking/api";
-import { FLOW_LEVELS, MOODS, SYMPTOMS, type CycleLog, type FlowLevel } from "@/features/cycle-tracking/types";
+import {
+  ENERGY_LEVELS,
+  FLOW_LEVELS,
+  MOODS,
+  SYMPTOMS,
+  type CycleLog,
+  type EnergyLevel,
+  type FlowLevel,
+} from "@/features/cycle-tracking/types";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { format } from "date-fns";
 import { Trash2 } from "lucide-react";
@@ -19,6 +27,8 @@ export function DayEditor({ date, log, monthKey }: { date: Date; log: CycleLog |
   const [flow, setFlow] = useState<FlowLevel | undefined>(log?.flow);
   const [symptoms, setSymptoms] = useState<string[]>(log?.symptoms ?? []);
   const [mood, setMood] = useState<string | undefined>(log?.mood);
+  const [painLevel, setPainLevel] = useState<number | undefined>(log?.painLevel);
+  const [energyLevel, setEnergyLevel] = useState<EnergyLevel | undefined>(log?.energyLevel);
   const [notes, setNotes] = useState(log?.notes ?? "");
 
   function invalidate() {
@@ -33,6 +43,8 @@ export function DayEditor({ date, log, monthKey }: { date: Date; log: CycleLog |
         flow: isPeriodDay ? flow : undefined,
         symptoms,
         mood,
+        painLevel,
+        energyLevel,
         notes: notes || undefined,
       }),
     onSuccess: () => {
@@ -49,6 +61,8 @@ export function DayEditor({ date, log, monthKey }: { date: Date; log: CycleLog |
       setFlow(undefined);
       setSymptoms([]);
       setMood(undefined);
+      setPainLevel(undefined);
+      setEnergyLevel(undefined);
       setNotes("");
       toast("Cleared this day");
     },
@@ -139,6 +153,49 @@ export function DayEditor({ date, log, monthKey }: { date: Date; log: CycleLog |
               }`}
             >
               {m}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <div className="space-y-1.5">
+        <div className="flex items-center justify-between">
+          <label htmlFor="cycle-pain" className="text-sm font-medium text-ink-700">
+            Pain level
+          </label>
+          <span className="text-sm font-semibold text-rose-600">
+            {painLevel != null ? painLevel : "—"}
+          </span>
+        </div>
+        <input
+          id="cycle-pain"
+          type="range"
+          min={0}
+          max={10}
+          step={1}
+          value={painLevel ?? 0}
+          onChange={(e) => setPainLevel(Number(e.target.value))}
+          className="w-full accent-rose-500"
+        />
+        <div className="flex justify-between text-xs text-ink-500">
+          <span>No pain</span>
+          <span>Severe</span>
+        </div>
+      </div>
+
+      <div className="space-y-1.5">
+        <p className="text-sm font-medium text-ink-700">Energy</p>
+        <div className="flex gap-2">
+          {ENERGY_LEVELS.map((level) => (
+            <button
+              key={level}
+              type="button"
+              onClick={() => setEnergyLevel((prev) => (prev === level ? undefined : level))}
+              className={`tap-target flex-1 rounded-[var(--radius-pill)] px-2 text-sm font-medium capitalize ${
+                energyLevel === level ? "bg-primary-600 text-white" : "bg-surface-60 text-ink-700"
+              }`}
+            >
+              {level}
             </button>
           ))}
         </div>
