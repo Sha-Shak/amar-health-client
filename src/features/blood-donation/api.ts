@@ -41,7 +41,9 @@ export const bloodDonationApi = {
 
   confirmDonation: (
     id: string,
-    input: { donorPatientCode: string; donationDate: string; place: string; bags: number }
+    input:
+      | { fromPlatform: true; donorId: string; donationDate: string; place: string; bags: number }
+      | { fromPlatform: false; donorName: string; donorPhone: string; donationDate: string; place: string; bags: number }
   ) => api.post(`/blood-requests/${id}/confirm-donation`, input),
 
   getMyDonorProfile: () => api.get<DonorProfile>("/blood-donors/me"),

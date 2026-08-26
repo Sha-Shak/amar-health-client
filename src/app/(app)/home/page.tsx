@@ -5,6 +5,7 @@ import { FeatureTile } from "@/components/home/feature-tile";
 import { HomeCarousel } from "@/components/home/home-carousel";
 import { HomeWidgetCarousel } from "@/components/home/home-widget-carousel";
 import { photos } from "@/config/photos";
+import { bloodDonationApi } from "@/features/blood-donation/api";
 import { cycleTrackingApi } from "@/features/cycle-tracking/api";
 import { healthTrackerApi } from "@/features/health-tracker/api";
 import { homeApi } from "@/features/home/api";
@@ -60,6 +61,11 @@ export default function HomeDashboardPage() {
     queryFn: notificationsApi.getUnreadCount,
   });
 
+  const myBloodRequestsQuery = useQuery({
+    queryKey: ["blood-requests", "mine"],
+    queryFn: () => bloodDonationApi.listRequests({ mine: true }),
+  });
+
   const reminders = remindersQuery.data ?? [];
   const upcomingReminders = upcomingQuery.data?.items ?? [];
   const vaultSummary = vaultSummaryQuery.data;
@@ -113,6 +119,7 @@ export default function HomeDashboardPage() {
         vaultSummary={vaultSummary}
         todayReminders={reminders}
         upcomingReminders={upcomingReminders}
+        myActiveBloodRequests={myBloodRequestsQuery.data?.items ?? []}
         cycleSummary={cycleSummaryQuery.data}
         showCycleTracker={showCycleTracker}
         healthInsights={healthInsightsQuery.data}

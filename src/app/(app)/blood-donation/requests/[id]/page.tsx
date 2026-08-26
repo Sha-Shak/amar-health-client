@@ -26,12 +26,16 @@ const URGENCY_STYLES: Record<string, string> = {
   normal: "bg-primary-50 text-primary-700",
 };
 
+type ConfirmStep = "closed" | "ask-platform" | "platform-form" | "external-form";
+
 export default function BloodRequestDetailPage() {
   const router = useRouter();
   const queryClient = useQueryClient();
   const id = useParams<{ id: string }>().id;
-  const [showConfirmForm, setShowConfirmForm] = useState(false);
-  const [donorPatientCode, setDonorPatientCode] = useState("");
+  const [confirmStep, setConfirmStep] = useState<ConfirmStep>("closed");
+  const [selectedDonorId, setSelectedDonorId] = useState("");
+  const [donorName, setDonorName] = useState("");
+  const [donorPhone, setDonorPhone] = useState("");
   const [donationDate, setDonationDate] = useState(() => new Date().toISOString().slice(0, 10));
   const [place, setPlace] = useState("");
   const [bags, setBags] = useState("1");
@@ -43,6 +47,14 @@ export default function BloodRequestDetailPage() {
 
   function invalidateAll() {
     queryClient.invalidateQueries({ queryKey: ["blood-requests"] });
+  }
+
+  function resetConfirmForm() {
+    setConfirmStep("closed");
+    setSelectedDonorId("");
+    setDonorName("");
+    setDonorPhone("");
+    setPlace("");
   }
 
   const interestMutation = useMutation({
@@ -57,13 +69,26 @@ export default function BloodRequestDetailPage() {
 
   const confirmMutation = useMutation({
     mutationFn: () =>
-      bloodDonationApi.confirmDonation(id, { donorPatientCode, donationDate, place, bags: Number(bags) }),
+      confirmStep === "platform-form"
+        ? bloodDonationApi.confirmDonation(id, {
+            fromPlatform: true,
+            donorId: selectedDonorId,
+            donationDate,
+            place,
+            bags: Number(bags),
+          })
+        : bloodDonationApi.confirmDonation(id, {
+            fromPlatform: false,
+            donorName,
+            donorPhone,
+            donationDate,
+            place,
+            bags: Number(bags),
+          }),
     onSuccess: () => {
       invalidateAll();
-      setShowConfirmForm(false);
-      setDonorPatientCode("");
-      setPlace("");
-      toast.success("Donation confirmed — points awarded");
+      resetConfirmForm();
+      toast.success("Donation confirmed");
     },
     onError: (error) => toast.error(errorMessage(error)),
   });
@@ -159,8 +184,12 @@ export default function BloodRequestDetailPage() {
                   <p className="text-xs text-ink-500">{donor.bloodGroup ?? "—"}</p>
                 </div>
                 {donor.phone && (
-                  <a href={`tel:${donor.phone}`} className="tap-target rounded-full text-primary-700">
-                    <Phone size={16} aria-hidden="true" />
+                  <a
+                    href={`tel:${donor.phone}`}
+                    className="tap-target flex shrink-0 items-center gap-1.5 rounded-[var(--radius-pill)] bg-primary-50 px-3 py-1.5 text-sm font-semibold text-primary-700"
+                  >
+                    <Phone size={14} aria-hidden="true" />
+                    Call
                   </a>
                 )}
               </div>
@@ -176,40 +205,147 @@ export default function BloodRequestDetailPage() {
                   <div key={d._id} className="glass-panel flex items-center gap-3 p-3">
                     <CheckCircle2 size={18} className="shrink-0 text-primary-600" aria-hidden="true" />
                     <div className="min-w-0 flex-1">
-                      <p className="text-sm font-medium">{donor?.name ?? "Donor"}</p>
+                      <p className="text-sm font-medium">{donor?.name ?? d.donorName ?? "Donor"}</p>
                       <p className="text-xs text-ink-500">
                         {d.bags} bag{d.bags === 1 ? "" : "s"} · {d.place} ·{" "}
                         {format(new Date(d.donationDate), "MMM d, yyyy")}
                       </p>
                     </div>
-                    <span className="shrink-0 text-xs font-semibold text-coral-600">+{d.pointsAwarded} pts</span>
+                    {d.pointsAwarded > 0 && (
+                      <span className="shrink-0 text-xs font-semibold text-coral-600">+{d.pointsAwarded} pts</span>
+                    )}
                   </div>
                 );
               })}
             </div>
           )}
 
-          {!showConfirmForm ? (
+          {confirmStep === "closed" && (
             <button
               type="button"
-              onClick={() => setShowConfirmForm(true)}
+              onClick={() => setConfirmStep("ask-platform")}
               className="tap-target mt-4 flex w-full items-center justify-center gap-2 rounded-[var(--radius-pill)] bg-primary-600 py-3 font-semibold text-white"
             >
               <ShieldCheck size={18} aria-hidden="true" />
               Confirm a donation
             </button>
-          ) : (
+          )}
+
+          {confirmStep === "ask-platform" && (
+            <div className="glass-panel mt-4 space-y-4 p-5">
+              <p className="text-sm text-ink-700">Was this donor from Amar Health?</p>
+              <div className="flex gap-3">
+                <Button
+                  variant="glass"
+                  className="flex-1"
+                  onClick={() => setConfirmStep("external-form")}
+                >
+                  No
+                </Button>
+                <Button className="flex-1 !bg-primary-600" onClick={() => setConfirmStep("platform-form")}>
+                  Yes
+                </Button>
+              </div>
+              <button
+                type="button"
+                onClick={resetConfirmForm}
+                className="w-full text-center text-sm text-ink-500"
+              >
+                Cancel
+              </button>
+            </div>
+          )}
+
+          {confirmStep === "platform-form" && (
+            <div className="glass-panel mt-4 space-y-4 p-5">
+              {interestedDonors.length === 0 ? (
+                <p className="text-sm text-ink-700">
+                  No one has expressed interest yet — go back and confirm as someone off the platform
+                  instead.
+                </p>
+              ) : (
+                <div className="space-y-2">
+                  <p className="text-sm font-medium text-ink-700">Select the donor</p>
+                  {interestedDonors.map((donor) => (
+                    <button
+                      key={donor._id}
+                      type="button"
+                      onClick={() => setSelectedDonorId(donor._id)}
+                      className={`flex w-full items-center gap-3 rounded-[var(--radius-sm)] border p-3 text-left transition-colors ${
+                        selectedDonorId === donor._id
+                          ? "border-primary-600 bg-primary-50"
+                          : "border-black/5"
+                      }`}
+                    >
+                      <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary-50 text-primary-700">
+                        <User size={16} aria-hidden="true" />
+                      </span>
+                      <span className="min-w-0 flex-1">
+                        <span className="block truncate text-sm font-medium">{donor.name ?? "Anonymous"}</span>
+                        <span className="block text-xs text-ink-500">{donor.bloodGroup ?? "—"}</span>
+                      </span>
+                    </button>
+                  ))}
+                </div>
+              )}
+              <TextField
+                label="Donation date"
+                name="donationDate"
+                type="date"
+                value={donationDate}
+                onChange={(e) => setDonationDate(e.target.value)}
+              />
+              <TextField
+                label="Place"
+                name="place"
+                placeholder="e.g. Square Hospital"
+                value={place}
+                onChange={(e) => setPlace(e.target.value)}
+              />
+              <TextField
+                label="Bags"
+                name="bags"
+                type="number"
+                min={1}
+                value={bags}
+                onChange={(e) => setBags(e.target.value)}
+              />
+              {confirmMutation.isError && (
+                <p className="text-sm text-coral-600">{errorMessage(confirmMutation.error)}</p>
+              )}
+              <div className="flex gap-3">
+                <Button variant="glass" className="flex-1" onClick={resetConfirmForm}>
+                  Cancel
+                </Button>
+                <Button
+                  className="flex-1 !bg-primary-600"
+                  disabled={confirmMutation.isPending || !selectedDonorId || !place || !donationDate}
+                  onClick={() => confirmMutation.mutate()}
+                >
+                  {confirmMutation.isPending ? "Confirming…" : "Confirm"}
+                </Button>
+              </div>
+            </div>
+          )}
+
+          {confirmStep === "external-form" && (
             <div className="glass-panel mt-4 space-y-4 p-5">
               <p className="text-sm text-ink-700">
-                Ask the donor for their patient code (they can find it in Settings) to confirm they
-                actually donated — this is what credits their profile.
+                Off-platform donations are still recorded here, but there&apos;s no Amar Health profile
+                to award points to.
               </p>
               <TextField
-                label="Donor's patient code"
-                name="donorPatientCode"
-                placeholder="e.g. SHV-XXXXXX"
-                value={donorPatientCode}
-                onChange={(e) => setDonorPatientCode(e.target.value.toUpperCase())}
+                label="Donor's name"
+                name="donorName"
+                value={donorName}
+                onChange={(e) => setDonorName(e.target.value)}
+              />
+              <TextField
+                label="Donor's phone number"
+                name="donorPhone"
+                type="tel"
+                value={donorPhone}
+                onChange={(e) => setDonorPhone(e.target.value)}
               />
               <TextField
                 label="Donation date"
@@ -237,13 +373,13 @@ export default function BloodRequestDetailPage() {
                 <p className="text-sm text-coral-600">{errorMessage(confirmMutation.error)}</p>
               )}
               <div className="flex gap-3">
-                <Button variant="glass" className="flex-1" onClick={() => setShowConfirmForm(false)}>
+                <Button variant="glass" className="flex-1" onClick={resetConfirmForm}>
                   Cancel
                 </Button>
                 <Button
                   className="flex-1 !bg-primary-600"
                   disabled={
-                    confirmMutation.isPending || !donorPatientCode || !place || !donationDate
+                    confirmMutation.isPending || !donorName || !donorPhone || !place || !donationDate
                   }
                   onClick={() => confirmMutation.mutate()}
                 >

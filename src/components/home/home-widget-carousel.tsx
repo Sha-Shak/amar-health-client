@@ -1,5 +1,6 @@
 "use client";
 
+import type { BloodRequest } from "@/features/blood-donation/types";
 import type { CycleSummary } from "@/features/cycle-tracking/types";
 import { phaseLabel } from "@/features/cycle-tracking/types";
 import type { HealthInsights } from "@/features/health-tracker/types";
@@ -25,6 +26,7 @@ export function HomeWidgetCarousel({
   vaultSummary,
   todayReminders,
   upcomingReminders,
+  myActiveBloodRequests,
   cycleSummary,
   showCycleTracker,
   healthInsights,
@@ -32,6 +34,7 @@ export function HomeWidgetCarousel({
   vaultSummary: VaultSummary | undefined;
   todayReminders: Reminder[];
   upcomingReminders: Reminder[];
+  myActiveBloodRequests: BloodRequest[];
   cycleSummary: CycleSummary | undefined;
   showCycleTracker: boolean;
   healthInsights: HealthInsights | undefined;
@@ -47,7 +50,11 @@ export function HomeWidgetCarousel({
       icon: Droplets,
       label: "Blood Donation",
       render: () => (
-        <p className="text-sm text-ink-500">Find or offer blood in your community</p>
+        <p className="text-sm text-ink-500">
+          {myActiveBloodRequests.length > 0
+            ? `You have ${myActiveBloodRequests.length} active request${myActiveBloodRequests.length === 1 ? "" : "s"} — ${myActiveBloodRequests.reduce((sum, r) => sum + (r.interestCount ?? 0), 0)} interested`
+            : "Find or offer blood in your community"}
+        </p>
       ),
     },
     {

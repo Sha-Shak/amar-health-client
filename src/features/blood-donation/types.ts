@@ -34,7 +34,9 @@ export type InterestedDonor = {
 export type DonationRecord = {
   _id: string;
   requestId: string;
-  donorId: { _id: string; name?: string; patientCode: string } | string;
+  donorId?: { _id: string; name?: string; patientCode: string } | string | null;
+  donorName?: string;
+  donorPhone?: string;
   confirmedByUserId: string;
   donationDate: string;
   place: string;
