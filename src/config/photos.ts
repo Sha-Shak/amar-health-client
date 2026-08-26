@@ -24,5 +24,6 @@ export const photos = {
     family: unsplash("photo-1659352787906-f809a3b9e86e"),
     hospitals: unsplash("photo-1764885517847-79d62138cc58"),
     tests: unsplash("photo-1639772823849-6efbd173043c"),
+    cycleTracking: unsplash("photo-1740175919531-917f9862bb2d"),
   },
 };

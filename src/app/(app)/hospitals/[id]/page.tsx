@@ -66,17 +66,22 @@ export default function HospitalDetailPage() {
           </div>
         </div>
 
+        <a
+          href={mapsLinkFor({ mapLink: hospital.mapLink, location: hospital.location, address: hospital.address })}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="mt-3 flex items-center gap-3 rounded-[var(--radius-sm)] border border-primary-400/30 bg-surface-60 p-3 transition-transform duration-100 active:scale-[0.98]"
+        >
+          <span className="tap-target shrink-0 rounded-full bg-primary-50 text-primary-700">
+            <MapPin size={18} aria-hidden="true" />
+          </span>
+          <span className="min-w-0 flex-1 text-sm font-medium text-primary-700 underline">
+            {hospital.address}
+          </span>
+          <ExternalLink size={15} className="shrink-0 text-primary-700" aria-hidden="true" />
+        </a>
+
         <div className="mt-3 space-y-3">
-          <a
-            href={mapsLinkFor({ mapLink: hospital.mapLink, location: hospital.location, address: hospital.address })}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex items-start gap-2 text-sm text-primary-700"
-          >
-            <MapPin size={16} className="mt-0.5 shrink-0" aria-hidden="true" />
-            <span className="underline">{hospital.address}</span>
-            <ExternalLink size={13} className="mt-0.5 shrink-0" aria-hidden="true" />
-          </a>
           {hospital.contactPhone && (
             <a href={`tel:${hospital.contactPhone}`} className="flex items-start gap-2 text-sm text-ink-700">
               <Phone size={16} className="mt-0.5 shrink-0 text-ink-500" aria-hidden="true" />

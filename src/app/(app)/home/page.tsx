@@ -3,22 +3,13 @@
 import { useAuth } from "@/components/providers/auth-provider";
 import { FeatureTile } from "@/components/home/feature-tile";
 import { HomeCarousel } from "@/components/home/home-carousel";
-import { WideTile } from "@/components/home/wide-tile";
+import { HomeWidgetCarousel } from "@/components/home/home-widget-carousel";
 import { photos } from "@/config/photos";
+import { cycleTrackingApi } from "@/features/cycle-tracking/api";
 import { homeApi } from "@/features/home/api";
 import { remindersApi } from "@/features/reminders/api";
 import { useQuery } from "@tanstack/react-query";
-import {
-  Bell,
-  Building2,
-  CalendarHeart,
-  Droplets,
-  FlaskConical,
-  FolderHeart,
-  Pill,
-  Stethoscope,
-  Users,
-} from "lucide-react";
+import { Bell, Building2, FlaskConical, FolderHeart, Pill, Stethoscope, Users } from "lucide-react";
 import Link from "next/link";
 
 export default function HomeDashboardPage() {
@@ -39,12 +30,16 @@ export default function HomeDashboardPage() {
     queryFn: homeApi.getVaultSummary,
   });
 
+  const showCycleTracker = user?.gender === "female";
+  const cycleSummaryQuery = useQuery({
+    queryKey: ["cycle-summary"],
+    queryFn: cycleTrackingApi.getSummary,
+    enabled: showCycleTracker,
+  });
+
   const reminders = remindersQuery.data ?? [];
   const upcomingReminders = upcomingQuery.data?.items ?? [];
   const vaultSummary = vaultSummaryQuery.data;
-  const vaultTotal = vaultSummary
-    ? vaultSummary.prescriptionCount + vaultSummary.reportCount + vaultSummary.billCount
-    : undefined;
 
   const isLoading = remindersQuery.isLoading || vaultSummaryQuery.isLoading || upcomingQuery.isLoading;
 
@@ -91,27 +86,15 @@ export default function HomeDashboardPage() {
         <HomeCarousel todayReminders={reminders} upcomingReminders={upcomingReminders} />
       )}
 
-      <div className="mb-3">
-        <WideTile
-          href="/blood-donation"
-          label="Blood Donation"
-          description="Find or offer blood in your community"
-          icon={Droplets}
-        />
-      </div>
+      <HomeWidgetCarousel
+        vaultSummary={vaultSummary}
+        todayReminders={reminders}
+        upcomingReminders={upcomingReminders}
+        cycleSummary={cycleSummaryQuery.data}
+        showCycleTracker={showCycleTracker}
+      />
 
-      {vaultSummary && vaultTotal !== undefined && vaultTotal > 0 && (
-        <>
-          <h2 className="mb-3 text-lg font-semibold">Your vault</h2>
-          <div className="glass-panel mb-6 flex items-center justify-around p-4 text-center">
-            <VaultStat href="/vault/folder/prescription" label="Prescriptions" count={vaultSummary.prescriptionCount} />
-            <VaultStat href="/vault/folder/report" label="Reports" count={vaultSummary.reportCount} />
-            <VaultStat href="/vault/folder/bill" label="Bills" count={vaultSummary.billCount} />
-          </div>
-        </>
-      )}
-
-      <h2 className="mb-3 text-lg font-semibold">Explore</h2>
+      <h2 className="mb-3 mt-3 text-lg font-semibold">Explore</h2>
       <div className="grid grid-cols-2 gap-3">
         <FeatureTile href="/vault" label="Vault" icon={FolderHeart} photo={photos.tiles.vault} />
         <FeatureTile href="/find-care" label="Find Care" icon={Stethoscope} photo={photos.tiles.findCare} />
@@ -119,24 +102,7 @@ export default function HomeDashboardPage() {
         <FeatureTile href="/tests" label="Tests" icon={FlaskConical} photo={photos.tiles.tests} />
         <FeatureTile href="/hospitals" label="Hospitals" icon={Building2} photo={photos.tiles.hospitals} />
         <FeatureTile href="/family" label="Family" icon={Users} photo={photos.tiles.family} />
-        {user?.gender === "female" && (
-          <FeatureTile
-            href="/cycle-tracking"
-            label="Cycle Tracker"
-            icon={CalendarHeart}
-            gradient="from-rose-500 to-ink-900"
-          />
-        )}
       </div>
     </div>
-  );
-}
-
-function VaultStat({ href, label, count }: { href: string; label: string; count: number }) {
-  return (
-    <Link href={href}>
-      <p className="text-xl font-bold text-primary-700">{count}</p>
-      <p className="text-xs text-ink-500">{label}</p>
-    </Link>
   );
 }

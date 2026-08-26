@@ -4,13 +4,12 @@ import { PhotoSlot } from "@/components/ui/photo-slot";
 import { photos } from "@/config/photos";
 import { reminderSubtitle } from "@/features/home/format";
 import type { Reminder } from "@/features/reminders/types";
+import { useSwipeableCarousel } from "@/hooks/use-swipeable-carousel";
 import { useRouter } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
 
 type Slide = { key: string; href: string; photo: string; title: string; body: string };
 
 const INTERVAL_MS = 4500;
-const SWIPE_THRESHOLD_PX = 40;
 
 export function HomeCarousel({
   todayReminders,
@@ -23,54 +22,13 @@ export function HomeCarousel({
   // Always exactly 5 slides — only their content is dynamic (the reminders
   // slide's copy), so the index never needs re-clamping as data loads in.
   const slides = buildSlides(todayReminders, upcomingReminders);
-  const [index, setIndex] = useState(0);
-
-  const dragStartX = useRef<number | null>(null);
-  const dragDeltaX = useRef(0);
-  const [dragOffset, setDragOffset] = useState(0);
-
-  // Manual navigation (swipe) restarts the auto-advance clock rather than
-  // letting a stale timer fire again a moment later — otherwise a swipe could
-  // immediately get overridden by an auto-advance that was already halfway
-  // through its interval.
-  useEffect(() => {
-    const timer = setInterval(() => setIndex((i) => (i + 1) % slides.length), INTERVAL_MS);
-    return () => clearInterval(timer);
-  }, [slides.length, index]);
+  const { index, dragOffset, goTo, handlers } = useSwipeableCarousel(
+    slides.length,
+    INTERVAL_MS,
+    (i) => router.push((slides[i] ?? slides[0]).href),
+  );
 
   const slide = slides[index] ?? slides[0];
-
-  function goTo(delta: number) {
-    setIndex((i) => (i + delta + slides.length) % slides.length);
-  }
-
-  function handlePointerDown(e: React.PointerEvent) {
-    dragStartX.current = e.clientX;
-    dragDeltaX.current = 0;
-    (e.target as Element).setPointerCapture(e.pointerId);
-  }
-
-  function handlePointerMove(e: React.PointerEvent) {
-    if (dragStartX.current === null) return;
-    dragDeltaX.current = e.clientX - dragStartX.current;
-    setDragOffset(dragDeltaX.current);
-  }
-
-  function handlePointerUp() {
-    const delta = dragDeltaX.current;
-    dragStartX.current = null;
-    setDragOffset(0);
-
-    if (Math.abs(delta) > SWIPE_THRESHOLD_PX) {
-      goTo(delta < 0 ? 1 : -1);
-      return;
-    }
-    // Not a real swipe — treat it as a tap and navigate, same as the card
-    // being a plain link (it can't be an actual <Link> anymore since a drag
-    // gesture and a tap both start as the same pointerdown on the same
-    // element).
-    router.push(slide.href);
-  }
 
   return (
     <div
@@ -81,13 +39,7 @@ export function HomeCarousel({
         if (e.key === "ArrowLeft") goTo(-1);
         if (e.key === "ArrowRight") goTo(1);
       }}
-      onPointerDown={handlePointerDown}
-      onPointerMove={handlePointerMove}
-      onPointerUp={handlePointerUp}
-      onPointerCancel={() => {
-        dragStartX.current = null;
-        setDragOffset(0);
-      }}
+      {...handlers}
       className="relative mb-6 block h-56 touch-pan-y select-none overflow-hidden rounded-[var(--radius-card)]"
       style={{
         transform: dragOffset ? `translateX(${dragOffset * 0.3}px)` : undefined,
