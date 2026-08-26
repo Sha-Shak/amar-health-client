@@ -3,9 +3,12 @@
 import { TierBadge } from "@/components/blood-donation/tier-badge";
 import { FilterChips } from "@/components/search/filter-chips";
 import { AvatarPlaceholder } from "@/components/ui/avatar-placeholder";
+import { Button } from "@/components/ui/button";
 import { PhotoSlot } from "@/components/ui/photo-slot";
 import { Switch } from "@/components/ui/switch";
+import { TextField } from "@/components/ui/text-field";
 import { useAuth } from "@/components/providers/auth-provider";
+import { authApi } from "@/features/auth/api";
 import { bloodDonationApi } from "@/features/blood-donation/api";
 import { BLOOD_GROUPS, urgencyLabel, type BloodGroup, type BloodRequest } from "@/features/blood-donation/types";
 import { errorMessage } from "@/lib/error-message";
@@ -39,9 +42,11 @@ const TABS = [
 type Tab = (typeof TABS)[number]["value"];
 
 export default function BloodDonationHubPage() {
-  const { user } = useAuth();
+  const { user, refetch: refetchUser } = useAuth();
   const queryClient = useQueryClient();
   const [tab, setTab] = useState<Tab>("requests");
+  const [showPhonePrompt, setShowPhonePrompt] = useState(false);
+  const [phoneInput, setPhoneInput] = useState("");
 
   const { data: profile } = useQuery({
     queryKey: ["blood-donation", "me"],
@@ -58,6 +63,25 @@ export default function BloodDonationHubPage() {
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ["blood-donation", "me"] }),
     onError: (error) => toast.error(errorMessage(error)),
   });
+
+  const setPhoneMutation = useMutation({
+    mutationFn: authApi.setPhone,
+    onSuccess: async () => {
+      await refetchUser();
+      setShowPhonePrompt(false);
+      setPhoneInput("");
+      availabilityMutation.mutate(true);
+    },
+    onError: (error) => toast.error(errorMessage(error)),
+  });
+
+  function handleAvailabilityChange(checked: boolean) {
+    if (checked && !user?.phone) {
+      setShowPhonePrompt(true);
+      return;
+    }
+    availabilityMutation.mutate(checked);
+  }
 
   const hasBloodGroup = Boolean(user?.bloodGroup && user.bloodGroup !== "unknown");
   const showEligibleBanner = Boolean(
@@ -140,10 +164,46 @@ export default function BloodDonationHubPage() {
           </div>
           <Switch
             checked={profile?.isAvailable ?? false}
-            onChange={(checked) => availabilityMutation.mutate(checked)}
+            onChange={handleAvailabilityChange}
             label="Available to donate"
           />
         </div>
+
+        {showPhonePrompt && (
+          <div className="space-y-3 border-t border-black/5 pt-4">
+            <p className="text-sm text-ink-700">
+              Donors need a phone number so requesters can reach you — add yours to continue.
+            </p>
+            <TextField
+              label="Phone number"
+              name="phone"
+              type="tel"
+              placeholder="01XXXXXXXXX"
+              value={phoneInput}
+              onChange={(e) => setPhoneInput(e.target.value)}
+              error={setPhoneMutation.isError ? errorMessage(setPhoneMutation.error) : undefined}
+            />
+            <div className="flex gap-3">
+              <Button
+                variant="glass"
+                className="flex-1"
+                onClick={() => {
+                  setShowPhonePrompt(false);
+                  setPhoneInput("");
+                }}
+              >
+                Cancel
+              </Button>
+              <Button
+                className="flex-1 !bg-primary-600"
+                disabled={setPhoneMutation.isPending || !phoneInput}
+                onClick={() => setPhoneMutation.mutate(phoneInput)}
+              >
+                {setPhoneMutation.isPending ? "Saving…" : "Save & continue"}
+              </Button>
+            </div>
+          </div>
+        )}
 
         <Link
           href="/blood-donation/requests/new"

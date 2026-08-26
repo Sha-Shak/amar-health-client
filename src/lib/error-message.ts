@@ -3,6 +3,7 @@ import { ApiRequestError } from "./api-client";
 const MESSAGES: Record<string, string> = {
   EMAIL_TAKEN: "An account with this email already exists.",
   PHONE_TAKEN: "An account with this phone number already exists.",
+  PHONE_ALREADY_SET: "A phone number is already on this account.",
   INVALID_CREDENTIALS: "Incorrect phone/email or password.",
   ACCOUNT_NOT_ACTIVE: "This account is not active.",
   INVALID_RESET_TOKEN: "This reset link is invalid or expired.",

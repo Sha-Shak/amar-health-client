@@ -44,6 +44,11 @@ export default function ProfilePage() {
           {/* Per Backend Spec §5.2 — the patientCode is what a patient reads off to
               share with a doctor, so it stays visible here, not tucked in edit. */}
           <p className="text-sm text-ink-500">Patient code: {user.patientCode}</p>
+          {(user.email || user.phone) && (
+            <p className="truncate text-sm text-ink-500">
+              {[user.email, user.phone].filter(Boolean).join(" · ")}
+            </p>
+          )}
         </div>
       </div>
 

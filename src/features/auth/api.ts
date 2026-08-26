@@ -35,6 +35,8 @@ export const authApi = {
 
   updateMe: (patch: Record<string, unknown>) => api.patch<User>("/patient/me", patch),
 
+  setPhone: (phone: string) => api.patch<User>("/patient/me/phone", { phone }),
+
   requestPresignedUrl: (purpose: "avatar" | "document", contentType: string) =>
     api.post<{ uploadUrl: string; fileKey: string }>("/uploads/presigned-url", {
       purpose,
