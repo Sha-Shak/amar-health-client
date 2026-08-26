@@ -1,21 +1,20 @@
 "use client";
 
-import { Sparkline } from "@/components/health-tracker/sparkline";
+import { BarTrendChart, MoodDonut, PairedBarChart, ScoreRing } from "@/components/health-tracker/charts";
 import { healthTrackerApi } from "@/features/health-tracker/api";
 import { METRIC_META } from "@/features/health-tracker/types";
 import { useQuery } from "@tanstack/react-query";
 import { BarChart3, ChevronLeft } from "lucide-react";
 import { useRouter } from "next/navigation";
 
-const NUMERIC_FIELD_TO_METRIC: Record<string, { label: string; unit: string }> = {
-  weightKg: METRIC_META.weight,
-  bloodGlucose: METRIC_META.blood_glucose,
-  heartRate: METRIC_META.heart_rate,
-  mood: METRIC_META.mood,
-  stress: METRIC_META.stress,
-  sleepHours: METRIC_META.sleep,
-  waterLiters: METRIC_META.water,
-  exerciseMinutes: METRIC_META.exercise,
+const NUMERIC_FIELD_TO_METRIC: Record<string, { label: string; unit: string; color: string }> = {
+  weightKg: { ...METRIC_META.weight, color: "var(--color-primary-600)" },
+  bloodGlucose: { ...METRIC_META.blood_glucose, color: "var(--color-coral-600)" },
+  heartRate: { ...METRIC_META.heart_rate, color: "var(--color-coral-600)" },
+  sleepHours: { ...METRIC_META.sleep, color: "var(--color-primary-600)" },
+  waterLiters: { ...METRIC_META.water, color: "var(--color-primary-600)" },
+  exerciseMinutes: { ...METRIC_META.exercise, color: "var(--color-success-500)" },
+  screenTimeHours: { ...METRIC_META.screen_time, color: "var(--color-amber-500)" },
 };
 
 export default function HealthInsightsPage() {
@@ -57,80 +56,87 @@ export default function HealthInsightsPage() {
       )}
 
       {insights && insights.totalLogged > 0 && (
-        <div className="space-y-4">
+        <div className="space-y-5">
+          {insights.healthScore.value != null && (
+            <section className="glass-panel-strong flex items-center gap-4 p-5">
+              <ScoreRing value={insights.healthScore.value} label={insights.healthScore.label ?? ""} />
+              <div className="min-w-0 flex-1 space-y-1.5">
+                <p className="font-semibold text-ink-900">Health score</p>
+                <p className="text-xs text-ink-500">
+                  Combines the metrics below with recent data — not a diagnosis, just a quick
+                  pulse-check.
+                </p>
+                <div className="space-y-1 pt-1">
+                  {insights.healthScore.breakdown.map((c) => (
+                    <div key={c.key} className="flex items-center gap-2">
+                      <span className="w-20 shrink-0 truncate text-[11px] text-ink-500">{c.label}</span>
+                      <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-ink-500/15">
+                        <div
+                          className="h-full rounded-full bg-primary-600"
+                          style={{ width: `${c.score}%` }}
+                        />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </section>
+          )}
+
+          {insights.moodCounts.some((c) => c > 0) && (
+            <section className="glass-panel p-4">
+              <p className="mb-3 font-semibold text-ink-900">Mood distribution</p>
+              <MoodDonut counts={insights.moodCounts} />
+            </section>
+          )}
+
           {Object.entries(insights.trends)
             .filter(([, points]) => points.length > 0)
             .map(([field, points]) => {
               const meta = NUMERIC_FIELD_TO_METRIC[field];
               if (!meta) return null;
-              return <MetricCard key={field} label={meta.label} unit={meta.unit} points={points.map((p) => p.value)} />;
+              const latest = points[points.length - 1].value;
+              return (
+                <section key={field} className="glass-panel p-4">
+                  <div className="mb-2 flex items-baseline justify-between">
+                    <p className="font-semibold text-ink-900">{meta.label}</p>
+                    <p className="text-sm text-ink-500">
+                      Latest: <span className="font-semibold text-primary-700">{latest}</span>{" "}
+                      {meta.unit}
+                    </p>
+                  </div>
+                  <BarTrendChart points={points} color={meta.color} />
+                </section>
+              );
             })}
 
           {insights.bloodPressure.length > 0 && (
             <section className="glass-panel p-4">
-              <div className="mb-3 flex items-baseline justify-between">
+              <div className="mb-2 flex items-center justify-between">
                 <p className="font-semibold text-ink-900">Blood pressure</p>
                 <p className="text-sm text-ink-500">
-                  <span className="text-base font-bold text-primary-700">
+                  <span className="font-semibold text-primary-700">
                     {insights.bloodPressure[insights.bloodPressure.length - 1].systolic}/
                     {insights.bloodPressure[insights.bloodPressure.length - 1].diastolic}
                   </span>{" "}
                   mmHg
                 </p>
               </div>
-              {insights.bloodPressure.length > 1 ? (
-                <div className="space-y-2">
-                  <LegendedSparkline
-                    label="Systolic"
-                    color="var(--color-coral-600)"
-                    points={insights.bloodPressure.map((p) => p.systolic)}
-                  />
-                  <LegendedSparkline
-                    label="Diastolic"
-                    color="var(--color-primary-600)"
-                    points={insights.bloodPressure.map((p) => p.diastolic)}
-                  />
-                </div>
-              ) : (
-                <NotEnoughDataHint />
-              )}
-            </section>
-          )}
-
-          {insights.screenTime.length > 0 && (
-            <section className="glass-panel p-4">
-              <p className="mb-3 font-semibold text-ink-900">Screen time (minutes/day)</p>
-              {insights.screenTime.length > 1 ? (
-                <div className="space-y-3">
-                  <LegendedSparkline
-                    label="Work"
-                    color="var(--color-primary-600)"
-                    unit="min"
-                    height={32}
-                    points={insights.screenTime.map((p) => p.work)}
-                  />
-                  <LegendedSparkline
-                    label="Entertainment"
-                    color="var(--color-amber-500)"
-                    unit="min"
-                    height={32}
-                    points={insights.screenTime.map((p) => p.entertainment)}
-                  />
-                  <LegendedSparkline
-                    label="Doomscrolling"
-                    color="var(--color-coral-600)"
-                    unit="min"
-                    height={32}
-                    points={insights.screenTime.map((p) => p.scrolling)}
-                  />
-                </div>
-              ) : (
-                <div className="grid grid-cols-3 gap-3 text-center">
-                  <ScreenTimeStat label="Work" value={insights.screenTime[0].work} />
-                  <ScreenTimeStat label="Fun" value={insights.screenTime[0].entertainment} />
-                  <ScreenTimeStat label="Scroll" value={insights.screenTime[0].scrolling} />
-                </div>
-              )}
+              <div className="mb-2 flex gap-4 text-xs text-ink-500">
+                <span className="flex items-center gap-1.5">
+                  <span className="h-2 w-2 rounded-full" style={{ backgroundColor: "var(--color-coral-600)" }} />
+                  Systolic
+                </span>
+                <span className="flex items-center gap-1.5">
+                  <span className="h-2 w-2 rounded-full" style={{ backgroundColor: "var(--color-primary-600)" }} />
+                  Diastolic
+                </span>
+              </div>
+              <PairedBarChart
+                points={insights.bloodPressure.map((p) => ({ date: p.date, a: p.systolic, b: p.diastolic }))}
+                colorA="var(--color-coral-600)"
+                colorB="var(--color-primary-600)"
+              />
             </section>
           )}
 
@@ -139,66 +145,6 @@ export default function HealthInsightsPage() {
           </p>
         </div>
       )}
-    </div>
-  );
-}
-
-function MetricCard({ label, unit, points }: { label: string; unit: string; points: number[] }) {
-  const latest = points[points.length - 1];
-  return (
-    <section className="glass-panel p-4">
-      <div className="mb-2 flex items-baseline justify-between">
-        <p className="font-semibold text-ink-900">{label}</p>
-        <p className="text-sm text-ink-500">
-          <span className="text-base font-bold text-primary-700">{latest}</span>
-          {unit ? ` ${unit}` : ""}
-        </p>
-      </div>
-      {points.length > 1 ? <Sparkline points={points} /> : <NotEnoughDataHint />}
-    </section>
-  );
-}
-
-function NotEnoughDataHint() {
-  return <p className="text-xs text-ink-500">Log a few more check-ins to see a trend here.</p>;
-}
-
-function LegendedSparkline({
-  label,
-  color,
-  unit,
-  points,
-  height,
-}: {
-  label: string;
-  color: string;
-  unit?: string;
-  points: number[];
-  height?: number;
-}) {
-  const latest = points[points.length - 1];
-  return (
-    <div>
-      <div className="mb-1 flex items-center justify-between text-sm">
-        <span className="flex items-center gap-1.5 font-medium text-ink-900">
-          <span className="h-2 w-2 rounded-full" style={{ backgroundColor: color }} aria-hidden="true" />
-          {label}
-        </span>
-        <span className="text-ink-500">
-          {latest}
-          {unit ? ` ${unit}` : ""}
-        </span>
-      </div>
-      <Sparkline points={points} color={color} height={height} />
-    </div>
-  );
-}
-
-function ScreenTimeStat({ label, value }: { label: string; value: number }) {
-  return (
-    <div>
-      <p className="text-lg font-bold text-primary-700">{value}</p>
-      <p className="text-xs text-ink-500">{label}</p>
     </div>
   );
 }

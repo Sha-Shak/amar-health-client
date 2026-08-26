@@ -22,7 +22,7 @@ export const METRIC_META: Record<MetricType, { label: string; unit: string; desc
   sleep: { label: "Sleep", unit: "hrs", description: "Hours slept" },
   water: { label: "Water", unit: "L", description: "Water intake" },
   exercise: { label: "Exercise", unit: "min", description: "Minutes of activity" },
-  screen_time: { label: "Screen time", unit: "min", description: "Work, fun, and scrolling" },
+  screen_time: { label: "Screen time", unit: "hrs", description: "Total time on your phone/computer" },
 };
 
 export const FREQUENCIES = ["daily", "weekly", "monthly"] as const;
@@ -42,9 +42,7 @@ export type HealthLog = {
   sleepHours?: number;
   waterLiters?: number;
   exerciseMinutes?: number;
-  screenTimeWorkMinutes?: number;
-  screenTimeEntertainmentMinutes?: number;
-  screenTimeScrollingMinutes?: number;
+  screenTimeHours?: number;
   notes?: string;
 };
 
@@ -55,12 +53,16 @@ export type HealthTrackerSettings = {
 
 export type TrendPoint = { date: string; value: number };
 export type BloodPressurePoint = { date: string; systolic: number; diastolic: number };
-export type ScreenTimePoint = { date: string; work: number; entertainment: number; scrolling: number };
+
+export type ScoreComponent = { key: string; label: string; score: number };
+export type HealthScore = { value: number | null; label: string | null; breakdown: ScoreComponent[] };
 
 export type HealthInsights = {
   trends: Record<string, TrendPoint[]>;
   bloodPressure: BloodPressurePoint[];
-  screenTime: ScreenTimePoint[];
+  moodCounts: number[]; // index 0 = mood level 1 ... index 4 = mood level 5
+  healthScore: HealthScore;
+  heightCm: number | null;
   latestDate: string | null;
   totalLogged: number;
   loggedDates: string[];

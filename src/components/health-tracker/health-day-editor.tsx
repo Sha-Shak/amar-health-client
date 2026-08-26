@@ -40,9 +40,7 @@ export function HealthDayEditor({
   const [sleepHours, setSleepHours] = useState(log?.sleepHours?.toString() ?? "");
   const [waterLiters, setWaterLiters] = useState(log?.waterLiters ?? 0);
   const [exerciseMinutes, setExerciseMinutes] = useState(log?.exerciseMinutes ?? 0);
-  const [screenWork, setScreenWork] = useState(log?.screenTimeWorkMinutes ?? 0);
-  const [screenFun, setScreenFun] = useState(log?.screenTimeEntertainmentMinutes ?? 0);
-  const [screenScroll, setScreenScroll] = useState(log?.screenTimeScrollingMinutes ?? 0);
+  const [screenTimeHours, setScreenTimeHours] = useState(log?.screenTimeHours ?? 0);
   const [notes, setNotes] = useState(log?.notes ?? "");
   const [stepIndex, setStepIndex] = useState(0);
 
@@ -64,9 +62,7 @@ export function HealthDayEditor({
         sleepHours: sleepHours ? Number(sleepHours) : undefined,
         waterLiters: has("water") ? waterLiters : undefined,
         exerciseMinutes: has("exercise") ? exerciseMinutes : undefined,
-        screenTimeWorkMinutes: has("screen_time") ? screenWork : undefined,
-        screenTimeEntertainmentMinutes: has("screen_time") ? screenFun : undefined,
-        screenTimeScrollingMinutes: has("screen_time") ? screenScroll : undefined,
+        screenTimeHours: has("screen_time") ? screenTimeHours : undefined,
         notes: notes || undefined,
       }),
     onSuccess: () => {
@@ -158,30 +154,15 @@ export function HealthDayEditor({
     has("screen_time") && {
       key: "screen_time",
       node: (
-        <div>
-          <p className="mb-2 text-sm font-medium text-ink-700">Screen time (minutes)</p>
-          <div className="space-y-4">
-            <SliderField label="Work" value={screenWork} onChange={setScreenWork} min={0} max={600} step={15} compact />
-            <SliderField
-              label="Entertainment"
-              value={screenFun}
-              onChange={setScreenFun}
-              min={0}
-              max={600}
-              step={15}
-              compact
-            />
-            <SliderField
-              label="Doomscrolling"
-              value={screenScroll}
-              onChange={setScreenScroll}
-              min={0}
-              max={600}
-              step={15}
-              compact
-            />
-          </div>
-        </div>
+        <SliderField
+          label="Screen time"
+          unit="hrs"
+          value={screenTimeHours}
+          onChange={setScreenTimeHours}
+          min={0}
+          max={16}
+          step={0.5}
+        />
       ),
     },
     {

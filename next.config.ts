@@ -3,7 +3,6 @@ import type { NextConfig } from "next";
 const nextConfig: NextConfig = {
   images: {
     remotePatterns: [
-      { protocol: "https", hostname: "images.unsplash.com" },
       { protocol: "http", hostname: "localhost", port: "4000" },
       // The deployed backend — avatar photos and vault document thumbnails
       // are served from here (apps/api's resolveFileUrl), same as localhost:4000

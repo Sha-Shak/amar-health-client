@@ -1,3 +1,4 @@
+import { cn } from "@/lib/cn";
 import { PhotoSlot } from "@/components/ui/photo-slot";
 import type { LucideIcon } from "lucide-react";
 import Link from "next/link";
@@ -8,17 +9,22 @@ export function FeatureTile({
   icon: Icon,
   photo,
   gradient = "from-primary-700 to-ink-900",
+  className,
 }: {
   href: string;
   label: string;
   icon: LucideIcon;
   photo?: string;
   gradient?: string;
+  className?: string;
 }) {
   return (
     <Link
       href={href}
-      className="group relative block h-32 overflow-hidden rounded-[var(--radius-card)] transition-transform duration-100 active:scale-[0.97]"
+      className={cn(
+        "group relative block h-32 overflow-hidden rounded-[var(--radius-card)] transition-transform duration-100 active:scale-[0.97]",
+        className,
+      )}
     >
       {/* Actual rendered width is ~166px (2-col grid in a max-w-sm page) — the
           default "100vw" would ask for a viewport-width image for a tile a

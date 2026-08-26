@@ -112,28 +112,35 @@ export default function HomeDashboardPage() {
       />
 
       <h2 className="mb-3 mt-3 text-lg font-semibold">Explore</h2>
-      <div className="grid grid-cols-2 gap-3">
-        <FeatureTile href="/vault" label="Vault" icon={FolderHeart} photo={photos.tiles.vault} />
-        <FeatureTile href="/find-care" label="Find Care" icon={Stethoscope} photo={photos.tiles.findCare} />
-        <FeatureTile href="/medicine" label="Medicine" icon={Pill} photo={photos.tiles.medicine} />
-        <FeatureTile href="/tests" label="Tests" icon={FlaskConical} photo={photos.tiles.tests} />
-        <FeatureTile href="/hospitals" label="Hospitals" icon={Building2} photo={photos.tiles.hospitals} />
-        <FeatureTile href="/family" label="Family" icon={Users} photo={photos.tiles.family} />
-        <FeatureTile
-          href="/health-tracker"
-          label="Health Tracker"
-          icon={HeartPulse}
-          gradient="from-primary-600 to-ink-900"
-        />
-        {showCycleTracker && (
-          <FeatureTile
-            href="/cycle-tracking"
-            label="Cycle Tracker"
-            icon={CalendarHeart}
-            photo={photos.tiles.cycleTracking}
-          />
-        )}
-      </div>
+      <ExploreGrid showCycleTracker={showCycleTracker} />
+    </div>
+  );
+}
+
+function ExploreGrid({ showCycleTracker }: { showCycleTracker: boolean }) {
+  const tiles = [
+    { href: "/health-tracker", label: "Health Tracker", icon: HeartPulse, photo: photos.tiles.healthTracker },
+    { href: "/vault", label: "Vault", icon: FolderHeart, photo: photos.tiles.vault },
+    { href: "/hospitals", label: "Hospitals", icon: Building2, photo: photos.tiles.hospitals },
+    { href: "/find-care", label: "Find Care", icon: Stethoscope, photo: photos.tiles.findCare },
+    { href: "/medicine", label: "Medicine", icon: Pill, photo: photos.tiles.medicine },
+    { href: "/family", label: "Family", icon: Users, photo: photos.tiles.family },
+    { href: "/tests", label: "Tests", icon: FlaskConical, photo: photos.tiles.tests },
+    ...(showCycleTracker
+      ? [{ href: "/cycle-tracking", label: "Cycle Tracker", icon: CalendarHeart, photo: photos.tiles.cycleTracking }]
+      : []),
+  ];
+
+  // An odd tile count leaves a lone tile alone in the grid's last row with
+  // half the row empty — stretch just that last tile across both columns
+  // instead, so the grid always ends flush.
+  const isOdd = tiles.length % 2 === 1;
+
+  return (
+    <div className="grid grid-cols-2 gap-3">
+      {tiles.map((tile, i) => (
+        <FeatureTile key={tile.href} {...tile} className={isOdd && i === tiles.length - 1 ? "col-span-2" : undefined} />
+      ))}
     </div>
   );
 }
