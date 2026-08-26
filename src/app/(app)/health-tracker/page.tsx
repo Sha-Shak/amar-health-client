@@ -2,6 +2,7 @@
 
 import { HealthCalendar } from "@/components/health-tracker/health-calendar";
 import { HealthDayEditor } from "@/components/health-tracker/health-day-editor";
+import { TrackerSettingsForm } from "@/components/health-tracker/tracker-settings-form";
 import { healthTrackerApi } from "@/features/health-tracker/api";
 import { nextDueDate } from "@/features/health-tracker/types";
 import { useQuery } from "@tanstack/react-query";
@@ -89,60 +90,75 @@ export default function HealthTrackerPage() {
         </div>
       </div>
 
-      {isDue && settings && (
-        <div className="glass-panel mb-5 flex items-center gap-3 p-4">
-          <span className="tap-target rounded-full bg-primary-50 text-primary-700">
-            <HeartPulse size={18} aria-hidden="true" />
-          </span>
-          <div className="min-w-0 flex-1">
-            <p className="font-semibold text-ink-900">Time for your check-in</p>
-            <p className="text-sm text-ink-500">
-              {settings.frequency[0].toUpperCase() + settings.frequency.slice(1)} check-ins — log
-              today below
+      {settings && !settings.setupComplete ? (
+        <div className="space-y-5">
+          <div className="glass-panel space-y-1 p-4">
+            <p className="font-semibold text-ink-900">Let&apos;s set up your tracking</p>
+            <p className="text-sm text-ink-700">
+              Pick how often you want to check in and which metrics matter to you — you can always
+              change these later in settings.
             </p>
           </div>
+          <TrackerSettingsForm initial={settings} submitLabel="Get started" />
         </div>
-      )}
+      ) : (
+        <>
+          {isDue && settings && (
+            <div className="glass-panel mb-5 flex items-center gap-3 p-4">
+              <span className="tap-target rounded-full bg-primary-50 text-primary-700">
+                <HeartPulse size={18} aria-hidden="true" />
+              </span>
+              <div className="min-w-0 flex-1">
+                <p className="font-semibold text-ink-900">Time for your check-in</p>
+                <p className="text-sm text-ink-500">
+                  {settings.frequency[0].toUpperCase() + settings.frequency.slice(1)} check-ins — log
+                  today below
+                </p>
+              </div>
+            </div>
+          )}
 
-      <div className="glass-panel mb-5 p-4">
-        <HealthCalendar
-          month={month}
-          onMonthChange={setMonth}
-          selected={selectedDate}
-          onSelect={setSelectedDate}
-          goodDates={goodDates}
-          okDates={okDates}
-          toughDates={toughDates}
-          neutralLoggedDates={neutralLoggedDates}
-        />
-        <div className="mt-3 flex flex-wrap gap-x-4 gap-y-1.5 text-xs text-ink-500">
-          <Legend swatch="bg-success-500" label="Good day" />
-          <Legend swatch="bg-amber-500" label="Okay" />
-          <Legend swatch="bg-coral-500" label="Tough" />
-          <Legend swatch="bg-primary-600" label="Logged" />
-        </div>
-        {!isToday(selectedDate) && (
-          <button
-            type="button"
-            onClick={() => {
-              setSelectedDate(new Date());
-              setMonth(startOfMonth(new Date()));
-            }}
-            className="mt-3 text-sm font-medium text-primary-700"
-          >
-            Jump to today
-          </button>
-        )}
-      </div>
+          <div className="glass-panel mb-5 p-4">
+            <HealthCalendar
+              month={month}
+              onMonthChange={setMonth}
+              selected={selectedDate}
+              onSelect={setSelectedDate}
+              goodDates={goodDates}
+              okDates={okDates}
+              toughDates={toughDates}
+              neutralLoggedDates={neutralLoggedDates}
+            />
+            <div className="mt-3 flex flex-wrap gap-x-4 gap-y-1.5 text-xs text-ink-500">
+              <Legend swatch="bg-success-500" label="Good day" />
+              <Legend swatch="bg-amber-500" label="Okay" />
+              <Legend swatch="bg-coral-500" label="Tough" />
+              <Legend swatch="bg-primary-600" label="Logged" />
+            </div>
+            {!isToday(selectedDate) && (
+              <button
+                type="button"
+                onClick={() => {
+                  setSelectedDate(new Date());
+                  setMonth(startOfMonth(new Date()));
+                }}
+                className="mt-3 text-sm font-medium text-primary-700"
+              >
+                Jump to today
+              </button>
+            )}
+          </div>
 
-      {settings && logsQuery.isFetched && (
-        <HealthDayEditor
-          key={selectedDateStr}
-          date={selectedDate}
-          log={selectedLog}
-          monthKey={monthStr}
-          enabledMetrics={settings.enabledMetrics}
-        />
+          {settings && logsQuery.isFetched && (
+            <HealthDayEditor
+              key={selectedDateStr}
+              date={selectedDate}
+              log={selectedLog}
+              monthKey={monthStr}
+              enabledMetrics={settings.enabledMetrics}
+            />
+          )}
+        </>
       )}
     </div>
   );

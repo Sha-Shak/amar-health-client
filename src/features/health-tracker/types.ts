@@ -49,6 +49,7 @@ export type HealthLog = {
 export type HealthTrackerSettings = {
   frequency: Frequency;
   enabledMetrics: MetricType[];
+  setupComplete: boolean;
 };
 
 export type TrendPoint = { date: string; value: number };
