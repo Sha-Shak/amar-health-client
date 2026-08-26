@@ -44,6 +44,22 @@ export default function FamilyPage() {
     onSettled: () => setRemovingId(null),
   });
 
+  const leaveMutation = useMutation({
+    mutationFn: familyApi.leaveGroup,
+    onSuccess: (result) => {
+      queryClient.invalidateQueries({ queryKey: ["family", "me"] });
+      toast.success(result.groupDeleted ? "Family group deleted — everyone's free to join another" : "You left the family group");
+    },
+    onError: (err) => toast.error(errorMessage(err)),
+  });
+
+  function handleLeave() {
+    const message = myGroup?.isOwner
+      ? "You created this group — leaving will delete it for everyone. Continue?"
+      : "Leave this family group?";
+    if (window.confirm(message)) leaveMutation.mutate();
+  }
+
   if (isLoading) {
     return (
       <div className="mx-auto w-full max-w-sm px-5 pt-8">
@@ -105,7 +121,8 @@ export default function FamilyPage() {
           <FamilyMemberRow
             name={myGroup.isOwner ? `${myGroup.owner.name ?? "You"} (You)` : myGroup.owner.name ?? "Owner"}
             avatarUrl={myGroup.owner.avatarUrl}
-            contact={myGroup.owner.phone ?? myGroup.owner.email}
+            phone={myGroup.owner.phone}
+            email={myGroup.owner.email}
             badge="Owner"
           />
         )}
@@ -117,10 +134,11 @@ export default function FamilyPage() {
               key={member._id}
               name={isSelf ? `${member.userId.name ?? "You"} (You)` : member.userId.name ?? "Member"}
               avatarUrl={member.userId.avatarUrl}
-              contact={member.userId.phone ?? member.userId.email}
+              phone={member.userId.phone}
+              email={member.userId.email}
               badge="Member"
               onRemove={
-                myGroup.isOwner || isSelf ? () => removeMutation.mutate(member._id) : undefined
+                myGroup.isOwner && !isSelf ? () => removeMutation.mutate(member._id) : undefined
               }
               removing={removingId === member._id && removeMutation.isPending}
             />
@@ -128,10 +146,19 @@ export default function FamilyPage() {
         })}
       </div>
 
-      {!myGroup.isOwner && selfMember && (
-        <p className="pb-6 text-center text-xs text-ink-500">
-          Tap the X next to your name to leave this family group.
-        </p>
+      {(myGroup.isOwner || selfMember) && (
+        <button
+          type="button"
+          onClick={handleLeave}
+          disabled={leaveMutation.isPending}
+          className="tap-target mb-6 w-full rounded-[var(--radius-pill)] border border-coral-200 py-3 text-sm font-semibold text-coral-600 disabled:opacity-50"
+        >
+          {leaveMutation.isPending
+            ? "Leaving…"
+            : myGroup.isOwner
+              ? "Delete family group"
+              : "Leave family group"}
+        </button>
       )}
     </div>
   );

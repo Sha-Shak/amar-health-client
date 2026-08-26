@@ -22,4 +22,7 @@ export const familyApi = {
 
   removeMember: (memberId: string) =>
     api.delete<FamilyMember>(`/patient/family-groups/members/${memberId}`),
+
+  leaveGroup: () =>
+    api.post<{ wasOwner: boolean; groupDeleted: boolean }>("/patient/family-groups/leave"),
 };

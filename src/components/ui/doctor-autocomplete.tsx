@@ -29,11 +29,11 @@ export function DoctorAutocomplete({
   const { data } = useQuery({
     queryKey: ["doctors", "autocomplete", debouncedName],
     queryFn: () => directoryApi.searchDoctors({ q: debouncedName }),
-    enabled: debouncedName.trim().length > 1,
+    enabled: debouncedName.trim().length > 0,
   });
 
   const suggestions = data?.items ?? [];
-  const showDropdown = isOpen && debouncedName.trim().length > 1 && suggestions.length > 0;
+  const showDropdown = isOpen && debouncedName.trim().length > 0 && suggestions.length > 0;
 
   return (
     <div className="relative space-y-1.5">

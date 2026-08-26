@@ -17,6 +17,7 @@ const MESSAGES: Record<string, string> = {
   TARGET_ALREADY_IN_GROUP: "This person already belongs to another family group.",
   INVITATION_NOT_FOUND: "This invitation is invalid or has expired.",
   NOT_YOUR_INVITATION: "This invitation was sent to a different account.",
+  NOT_IN_GROUP: "You don't belong to a family group.",
   REQUEST_NOT_FOUND: "This blood request no longer exists.",
   NOT_REQUEST_OWNER: "Only the person who posted this request can do that.",
   CANNOT_RESPOND_TO_OWN_REQUEST: "You can't respond to your own request.",
