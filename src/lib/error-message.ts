@@ -15,6 +15,7 @@ const MESSAGES: Record<string, string> = {
   CANNOT_INVITE_SELF: "You can't invite yourself.",
   ALREADY_INVITED: "This person is already invited or a member.",
   TARGET_ALREADY_IN_GROUP: "This person already belongs to another family group.",
+  TARGET_HAS_PENDING_INVITE: "This person already has a pending invitation to another family group.",
   INVITATION_NOT_FOUND: "This invitation is invalid or has expired.",
   NOT_YOUR_INVITATION: "This invitation was sent to a different account.",
   NOT_IN_GROUP: "You don't belong to a family group.",
