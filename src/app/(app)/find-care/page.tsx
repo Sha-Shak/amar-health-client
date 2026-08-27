@@ -4,6 +4,7 @@ import { FilterChips } from "@/components/search/filter-chips";
 import { SearchBar } from "@/components/search/search-bar";
 import { AvatarPlaceholder } from "@/components/ui/avatar-placeholder";
 import { PhotoSlot } from "@/components/ui/photo-slot";
+import { PlatformDoctorBadge } from "@/components/directory/platform-doctor-badge";
 import { directoryApi } from "@/features/directory/api";
 import { SPECIALTIES, SPECIALTY_SEARCH_TERM, specialtyLabel, type Specialty } from "@/features/directory/types";
 import { useDebouncedValue } from "@/lib/use-debounced-value";
@@ -13,7 +14,16 @@ import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useState } from "react";
 
-const SPECIALTY_OPTIONS = SPECIALTIES.map((s) => ({ value: s, label: specialtyLabel(s) }));
+// "Platform Doctors" is a filter chip, not a specialty — it sits right after
+// "All" in the same row (not a separate control) and maps to tier=tier2
+// instead of the specialty param. Mutually exclusive with picking an actual
+// specialty, same as "All" is.
+const PLATFORM_FILTER = "platform" as const;
+type FilterValue = Specialty | typeof PLATFORM_FILTER;
+const FILTER_OPTIONS = [
+  { value: PLATFORM_FILTER, label: "Platform Doctors" },
+  ...SPECIALTIES.map((s) => ({ value: s as FilterValue, label: specialtyLabel(s) })),
+];
 
 export default function FindCarePage() {
   const searchParams = useSearchParams();
@@ -22,15 +32,17 @@ export default function FindCarePage() {
     (SPECIALTIES as readonly string[]).find((s) => s === specialtyParam) as Specialty | undefined;
 
   const [query, setQuery] = useState("");
-  const [specialty, setSpecialty] = useState<Specialty | null>(initialSpecialty ?? null);
+  const [filterValue, setFilterValue] = useState<FilterValue | null>(initialSpecialty ?? null);
   const debouncedQuery = useDebouncedValue(query, 300);
+  const isPlatformFilter = filterValue === PLATFORM_FILTER;
 
   const resultsQuery = useInfiniteQuery({
-    queryKey: ["doctors", "search", debouncedQuery, specialty],
+    queryKey: ["doctors", "search", debouncedQuery, filterValue],
     queryFn: ({ pageParam }) =>
       directoryApi.searchDoctors({
         q: debouncedQuery || undefined,
-        specialty: specialty ? SPECIALTY_SEARCH_TERM[specialty] : undefined,
+        specialty: filterValue && !isPlatformFilter ? SPECIALTY_SEARCH_TERM[filterValue] : undefined,
+        tier: isPlatformFilter ? "tier2" : undefined,
         cursor: pageParam,
       }),
     initialPageParam: null as string | null,
@@ -46,9 +58,9 @@ export default function FindCarePage() {
       <div className="mb-4 space-y-3">
         <SearchBar value={query} onChange={setQuery} placeholder="Search doctors" />
         <FilterChips
-          options={SPECIALTY_OPTIONS}
-          value={specialty}
-          onChange={setSpecialty}
+          options={FILTER_OPTIONS}
+          value={filterValue}
+          onChange={setFilterValue}
           allLabel="All"
         />
       </div>
@@ -82,9 +94,12 @@ export default function FindCarePage() {
               <p className="truncate text-sm text-ink-500">
                 {doctor.specialties.map(specialtyLabel).join(", ")}
               </p>
-              {doctor.experienceYears !== undefined && (
-                <p className="text-xs text-ink-500">{doctor.experienceYears} yrs experience</p>
-              )}
+              <div className="mt-1 flex items-center gap-2">
+                {doctor.experienceYears !== undefined && (
+                  <p className="text-xs text-ink-500">{doctor.experienceYears} yrs experience</p>
+                )}
+                {doctor.tier === "tier2" && <PlatformDoctorBadge />}
+              </div>
             </div>
           </Link>
         ))}

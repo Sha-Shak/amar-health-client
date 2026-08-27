@@ -1,5 +1,6 @@
 "use client";
 
+import { PlatformDoctorBadge } from "@/components/directory/platform-doctor-badge";
 import { PhotoSlot } from "@/components/ui/photo-slot";
 import { AvatarPlaceholder } from "@/components/ui/avatar-placeholder";
 import { Button } from "@/components/ui/button";
@@ -92,9 +93,9 @@ export default function DoctorDetailPage() {
           </div>
         </div>
 
-        <div className="mt-3 flex flex-wrap gap-2">
+        <div className="mt-3 flex flex-wrap items-center gap-2">
+          {doctor.tier === "tier2" ? <PlatformDoctorBadge /> : <Pill label="Directory Listing" />}
           {doctor.experienceYears !== undefined && <Pill label={`${doctor.experienceYears} yrs experience`} />}
-          <Pill label={doctor.tier === "tier1" ? "Platform Doctor" : "Directory Listing"} />
           {doctor.registrationNumber && <Pill label={`Reg. ${doctor.registrationNumber}`} />}
         </div>
 
@@ -133,9 +134,15 @@ export default function DoctorDetailPage() {
       </div>
 
       <div className="fixed inset-x-0 bottom-24 z-30 mx-auto w-full max-w-sm px-5">
-        <Button className="w-full" onClick={() => toast("Booking isn't built yet — coming in Flow 9")}>
-          Book Now
-        </Button>
+        {doctor.tier === "tier2" ? (
+          <Button className="w-full" onClick={() => toast("Booking isn't built yet — coming in Flow 9")}>
+            Book Now
+          </Button>
+        ) : (
+          <div className="glass-panel px-4 py-3 text-center text-sm text-ink-500">
+            Online booking isn&apos;t available for this listing — contact the chamber directly.
+          </div>
+        )}
       </div>
     </div>
   );
