@@ -21,8 +21,8 @@ import {
   Phone,
   Sparkles,
 } from "lucide-react";
+import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
-import { toast } from "sonner";
 
 export default function DoctorDetailPage() {
   const router = useRouter();
@@ -138,9 +138,9 @@ export default function DoctorDetailPage() {
 
       <div className="fixed inset-x-0 bottom-24 z-30 mx-auto w-full max-w-sm px-5">
         {doctor.tier === "tier2" ? (
-          <Button className="w-full" onClick={() => toast("Booking isn't built yet — coming in Flow 9")}>
-            Book Now
-          </Button>
+          <Link href={`/find-care/${id}/book`}>
+            <Button className="w-full">Book Now</Button>
+          </Link>
         ) : (
           <div className="glass-panel px-4 py-3 text-center text-sm text-ink-500">
             Online booking isn&apos;t available for this listing — contact the chamber directly.

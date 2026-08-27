@@ -92,6 +92,8 @@ export type VisitingHour = { day?: string; startTime?: string; endTime?: string 
 
 export type GeoPoint = { type: "Point"; coordinates: [number, number] }; // [lng, lat]
 
+export type VisitType = { name: string; fee: number };
+
 export type Chamber = {
   _id: string;
   doctorId: string;
@@ -102,6 +104,7 @@ export type Chamber = {
   mapLink?: string;
   visitingHours?: VisitingHour[];
   visitingHoursRaw?: string;
+  visitTypes?: VisitType[];
   consultationFee?: number;
   contactPhone?: string;
   isBookable: boolean;

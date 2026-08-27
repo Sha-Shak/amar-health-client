@@ -6,6 +6,7 @@ import { HomeCarousel } from "@/components/home/home-carousel";
 import { HomeWidgetCarousel } from "@/components/home/home-widget-carousel";
 import { photos } from "@/config/photos";
 import { bloodDonationApi } from "@/features/blood-donation/api";
+import { bookingApi } from "@/features/booking/api";
 import { cycleTrackingApi } from "@/features/cycle-tracking/api";
 import { healthTrackerApi } from "@/features/health-tracker/api";
 import { homeApi } from "@/features/home/api";
@@ -68,9 +69,21 @@ export default function HomeDashboardPage() {
     queryFn: () => bloodDonationApi.listRequests({ mine: true }),
   });
 
+  const nextBookingQuery = useQuery({
+    queryKey: ["bookings", "list", "confirmed"],
+    queryFn: () => bookingApi.listBookings({ status: "confirmed" }),
+  });
+
   const reminders = remindersQuery.data ?? [];
   const upcomingReminders = upcomingQuery.data?.items ?? [];
   const vaultSummary = vaultSummaryQuery.data;
+  // listBookings sorts by creation order, not appointment date — re-sort by
+  // the session's actual date to find what's genuinely coming up soonest.
+  const nextBooking = [...(nextBookingQuery.data?.items ?? [])].sort((a, b) => {
+    const aDate = typeof a.sessionId === "object" ? a.sessionId.date : "";
+    const bDate = typeof b.sessionId === "object" ? b.sessionId.date : "";
+    return aDate.localeCompare(bDate);
+  })[0];
 
   const isLoading = remindersQuery.isLoading || vaultSummaryQuery.isLoading || upcomingQuery.isLoading;
 
@@ -177,6 +190,7 @@ export default function HomeDashboardPage() {
           todayReminders={reminders}
           upcomingReminders={upcomingReminders}
           myActiveBloodRequests={myBloodRequestsQuery.data?.items ?? []}
+          nextBooking={nextBooking}
           cycleSummary={cycleSummaryQuery.data}
           showCycleTracker={showCycleTracker}
           healthInsights={healthInsightsQuery.data}

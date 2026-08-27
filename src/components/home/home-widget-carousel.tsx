@@ -1,5 +1,6 @@
 "use client";
 
+import type { Booking, BookingDoctorSummary } from "@/features/booking/types";
 import type { BloodRequest } from "@/features/blood-donation/types";
 import type { CycleSummary } from "@/features/cycle-tracking/types";
 import { phaseLabel } from "@/features/cycle-tracking/types";
@@ -7,7 +8,17 @@ import type { HealthInsights } from "@/features/health-tracker/types";
 import type { VaultSummary } from "@/features/home/types";
 import type { Reminder } from "@/features/reminders/types";
 import { useSwipeableCarousel } from "@/hooks/use-swipeable-carousel";
-import { Bell, CalendarHeart, ChevronLeft, ChevronRight, Droplets, FolderHeart, HeartPulse } from "lucide-react";
+import { format, parseISO } from "date-fns";
+import {
+  Bell,
+  CalendarClock,
+  CalendarHeart,
+  ChevronLeft,
+  ChevronRight,
+  Droplets,
+  FolderHeart,
+  HeartPulse,
+} from "lucide-react";
 import { useRouter } from "next/navigation";
 
 const INTERVAL_MS = 5500;
@@ -27,6 +38,7 @@ export function HomeWidgetCarousel({
   todayReminders,
   upcomingReminders,
   myActiveBloodRequests,
+  nextBooking,
   cycleSummary,
   showCycleTracker,
   healthInsights,
@@ -35,13 +47,33 @@ export function HomeWidgetCarousel({
   todayReminders: Reminder[];
   upcomingReminders: Reminder[];
   myActiveBloodRequests: BloodRequest[];
+  nextBooking: Booking | undefined;
   cycleSummary: CycleSummary | undefined;
   showCycleTracker: boolean;
   healthInsights: HealthInsights | undefined;
 }) {
   const router = useRouter();
+  const nextBookingDoctor =
+    nextBooking && typeof nextBooking.doctorId === "object" ? (nextBooking.doctorId as BookingDoctorSummary) : null;
+  const nextBookingSession =
+    nextBooking && typeof nextBooking.sessionId === "object" ? nextBooking.sessionId : null;
 
   const widgets: Widget[] = [
+    {
+      key: "bookings",
+      href: "/bookings",
+      panelClass: "glass-panel",
+      iconBadgeClass: "bg-primary-50 text-primary-700",
+      icon: CalendarClock,
+      label: "Appointments",
+      render: () => (
+        <p className="text-sm text-ink-500">
+          {nextBooking && nextBookingSession
+            ? `${nextBookingDoctor?.name ?? "Doctor"} — ${format(parseISO(nextBookingSession.date), "EEE, MMM d")}`
+            : "Book a doctor's appointment"}
+        </p>
+      ),
+    },
     {
       key: "blood-donation",
       href: "/blood-donation",

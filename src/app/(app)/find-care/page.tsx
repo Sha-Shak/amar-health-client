@@ -14,11 +14,10 @@ import {
 } from "@/features/directory/types";
 import { useDebouncedValue } from "@/lib/use-debounced-value";
 import { useInfiniteQuery } from "@tanstack/react-query";
-import { BadgeCheck, Stethoscope } from "lucide-react";
+import { BadgeCheck, CalendarClock, Stethoscope } from "lucide-react";
 import Link from "next/link";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
-import { toast } from "sonner";
 
 // "Platform Doctors" is a filter chip, not a specialty — it sits right after
 // "All" in the same row (not a separate control) and maps to tier=tier2
@@ -59,7 +58,16 @@ export default function FindCarePage() {
 
   return (
     <div className="mx-auto w-full max-w-sm px-5 pt-8">
-      <h1 className="mb-4 text-2xl font-bold">Find Care</h1>
+      <div className="mb-4 flex items-center justify-between">
+        <h1 className="text-2xl font-bold">Find Care</h1>
+        <Link
+          href="/bookings"
+          className="tap-target flex items-center gap-1.5 rounded-full bg-primary-50 px-3 py-1.5 text-sm font-semibold text-primary-700"
+        >
+          <CalendarClock size={16} aria-hidden="true" />
+          My Bookings
+        </Link>
+      </div>
 
       <div className="mb-4 space-y-3">
         <SearchBar value={query} onChange={setQuery} placeholder="Search doctors" />
@@ -103,6 +111,7 @@ export default function FindCarePage() {
 }
 
 function DoctorRow({ doctor }: { doctor: Doctor }) {
+  const router = useRouter();
   const isPlatform = doctor.tier === "tier2";
 
   return (
@@ -134,7 +143,7 @@ function DoctorRow({ doctor }: { doctor: Doctor }) {
             onClick={(e) => {
               e.preventDefault();
               e.stopPropagation();
-              toast("Booking isn't built yet — coming in Flow 9");
+              router.push(`/find-care/${doctor._id}/book`);
             }}
             className="tap-target rounded-[var(--radius-pill)] bg-primary-600 px-3 py-1.5 text-xs font-semibold text-white"
           >
