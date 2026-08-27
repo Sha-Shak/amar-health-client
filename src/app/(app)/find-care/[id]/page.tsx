@@ -1,6 +1,5 @@
 "use client";
 
-import { PlatformDoctorBadge } from "@/components/directory/platform-doctor-badge";
 import { PhotoSlot } from "@/components/ui/photo-slot";
 import { AvatarPlaceholder } from "@/components/ui/avatar-placeholder";
 import { Button } from "@/components/ui/button";
@@ -77,14 +76,18 @@ export default function DoctorDetailPage() {
           <ChevronLeft size={22} aria-hidden="true" />
         </button>
 
-        <div className="glass-panel flex items-start gap-4 p-5">
+        <div
+          className={`glass-panel flex items-start gap-4 p-5 ${doctor.tier === "tier2" ? "platform-doctor-card" : ""}`}
+        >
           <div className="relative h-20 w-20 shrink-0 overflow-hidden rounded-2xl bg-primary-50">
             {doctor.photoUrl ? <PhotoSlot alt="" src={doctor.photoUrl} /> : <AvatarPlaceholder />}
           </div>
           <div className="min-w-0 flex-1">
             <div className="flex items-center gap-1.5">
               <h1 className="text-lg font-bold leading-tight">{doctor.name}</h1>
-              <BadgeCheck size={16} className="shrink-0 text-primary-600" aria-hidden="true" />
+              {doctor.status === "verified" && (
+                <BadgeCheck size={16} className="shrink-0 text-primary-600" aria-hidden="true" />
+              )}
             </div>
             <p className="text-sm text-ink-500">{doctor.specialties.map(specialtyLabel).join(", ")}</p>
             {doctor.degrees && doctor.degrees.length > 0 && (
@@ -94,7 +97,7 @@ export default function DoctorDetailPage() {
         </div>
 
         <div className="mt-3 flex flex-wrap items-center gap-2">
-          {doctor.tier === "tier2" ? <PlatformDoctorBadge /> : <Pill label="Directory Listing" />}
+          {doctor.tier !== "tier2" && <Pill label="Directory Listing" />}
           {doctor.experienceYears !== undefined && <Pill label={`${doctor.experienceYears} yrs experience`} />}
           {doctor.registrationNumber && <Pill label={`Reg. ${doctor.registrationNumber}`} />}
         </div>

@@ -4,15 +4,21 @@ import { FilterChips } from "@/components/search/filter-chips";
 import { SearchBar } from "@/components/search/search-bar";
 import { AvatarPlaceholder } from "@/components/ui/avatar-placeholder";
 import { PhotoSlot } from "@/components/ui/photo-slot";
-import { PlatformDoctorBadge } from "@/components/directory/platform-doctor-badge";
 import { directoryApi } from "@/features/directory/api";
-import { SPECIALTIES, SPECIALTY_SEARCH_TERM, specialtyLabel, type Specialty } from "@/features/directory/types";
+import {
+  SPECIALTIES,
+  SPECIALTY_SEARCH_TERM,
+  specialtyLabel,
+  type Doctor,
+  type Specialty,
+} from "@/features/directory/types";
 import { useDebouncedValue } from "@/lib/use-debounced-value";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { BadgeCheck, Stethoscope } from "lucide-react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useState } from "react";
+import { toast } from "sonner";
 
 // "Platform Doctors" is a filter chip, not a specialty — it sits right after
 // "All" in the same row (not a separate control) and maps to tier=tier2
@@ -78,30 +84,7 @@ export default function FindCarePage() {
 
       <div className="space-y-2 pb-6">
         {doctors.map((doctor) => (
-          <Link key={doctor._id} href={`/find-care/${doctor._id}`} className="glass-panel flex gap-3 p-3">
-            <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-full bg-primary-50">
-              {doctor.photoUrl ? (
-                <PhotoSlot alt="" src={doctor.photoUrl} />
-              ) : (
-                <AvatarPlaceholder />
-              )}
-            </div>
-            <div className="min-w-0 flex-1 py-0.5">
-              <div className="flex items-center gap-1">
-                <p className="truncate font-semibold">{doctor.name}</p>
-                <BadgeCheck size={15} className="shrink-0 text-primary-600" aria-hidden="true" />
-              </div>
-              <p className="truncate text-sm text-ink-500">
-                {doctor.specialties.map(specialtyLabel).join(", ")}
-              </p>
-              <div className="mt-1 flex items-center gap-2">
-                {doctor.experienceYears !== undefined && (
-                  <p className="text-xs text-ink-500">{doctor.experienceYears} yrs experience</p>
-                )}
-                {doctor.tier === "tier2" && <PlatformDoctorBadge />}
-              </div>
-            </div>
-          </Link>
+          <DoctorRow key={doctor._id} doctor={doctor} />
         ))}
 
         {resultsQuery.hasNextPage && (
@@ -116,5 +99,49 @@ export default function FindCarePage() {
         )}
       </div>
     </div>
+  );
+}
+
+function DoctorRow({ doctor }: { doctor: Doctor }) {
+  const isPlatform = doctor.tier === "tier2";
+
+  return (
+    <Link
+      href={`/find-care/${doctor._id}`}
+      className={`glass-panel flex items-center gap-3 p-3 ${isPlatform ? "platform-doctor-card" : ""}`}
+    >
+      <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-full bg-primary-50">
+        {doctor.photoUrl ? <PhotoSlot alt="" src={doctor.photoUrl} /> : <AvatarPlaceholder />}
+      </div>
+      <div className="min-w-0 flex-1 py-0.5">
+        <div className="flex items-center gap-1">
+          <p className="truncate font-semibold">{doctor.name}</p>
+          {doctor.status === "verified" && (
+            <BadgeCheck size={15} className="shrink-0 text-primary-600" aria-hidden="true" />
+          )}
+        </div>
+        <p className="truncate text-sm text-ink-500">
+          {doctor.specialties.map(specialtyLabel).join(", ")}
+        </p>
+      </div>
+      <div className="flex shrink-0 flex-col items-end gap-1.5">
+        {doctor.experienceYears !== undefined && (
+          <p className="whitespace-nowrap text-xs text-ink-500">{doctor.experienceYears} yrs exp.</p>
+        )}
+        {isPlatform && (
+          <button
+            type="button"
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              toast("Booking isn't built yet — coming in Flow 9");
+            }}
+            className="tap-target rounded-[var(--radius-pill)] bg-primary-600 px-3 py-1.5 text-xs font-semibold text-white"
+          >
+            Book
+          </button>
+        )}
+      </div>
+    </Link>
   );
 }
