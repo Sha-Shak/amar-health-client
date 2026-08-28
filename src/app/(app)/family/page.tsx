@@ -17,10 +17,18 @@ export default function FamilyPage() {
   const { user } = useAuth();
   const queryClient = useQueryClient();
   const [removingId, setRemovingId] = useState<string | null>(null);
+  const [respondingToken, setRespondingToken] = useState<string | null>(null);
 
   const { data: myGroup, isLoading } = useQuery({
     queryKey: ["family", "me"],
     queryFn: familyApi.getMyGroup,
+  });
+
+  // Invites addressed to *this* user — shown regardless of whether they already
+  // have a group, since accepting/declining is exactly how that changes.
+  const { data: myInvites } = useQuery({
+    queryKey: ["family", "my-invites"],
+    queryFn: familyApi.getMyInvites,
   });
 
   const createMutation = useMutation({
@@ -30,6 +38,29 @@ export default function FamilyPage() {
       toast.success("Family group created");
     },
     onError: (err) => toast.error(errorMessage(err)),
+  });
+
+  const acceptInviteMutation = useMutation({
+    mutationFn: (token: string) => familyApi.acceptInvitation(token),
+    onMutate: (token) => setRespondingToken(token),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["family", "me"] });
+      queryClient.invalidateQueries({ queryKey: ["family", "my-invites"] });
+      toast.success("Joined the family group");
+    },
+    onError: (err) => toast.error(errorMessage(err)),
+    onSettled: () => setRespondingToken(null),
+  });
+
+  const declineInviteMutation = useMutation({
+    mutationFn: (token: string) => familyApi.declineInvitation(token),
+    onMutate: (token) => setRespondingToken(token),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["family", "my-invites"] });
+      toast.success("Invitation declined");
+    },
+    onError: (err) => toast.error(errorMessage(err)),
+    onSettled: () => setRespondingToken(null),
   });
 
   const removeMutation = useMutation({
@@ -60,6 +91,44 @@ export default function FamilyPage() {
     if (window.confirm(message)) leaveMutation.mutate();
   }
 
+  const invitesSection = myInvites && myInvites.length > 0 && (
+    <div className="mb-6 space-y-2">
+      <h2 className="mb-2 text-sm font-semibold text-ink-700">
+        {myInvites.length > 1 ? "Invitations" : "Invitation"}
+      </h2>
+      {myInvites.map((invite) => {
+        const owner = invite.familyGroupId.ownerId;
+        const isResponding = respondingToken === invite.inviteToken;
+        return (
+          <div key={invite._id} className="glass-panel space-y-3 p-3">
+            <FamilyMemberRow
+              name={owner?.name ? `${owner.name}'s family group` : "Family group invitation"}
+              avatarUrl={owner?.avatarUrl}
+              badge="Invited you"
+            />
+            <div className="flex gap-2">
+              <Button
+                className="flex-1"
+                disabled={isResponding}
+                onClick={() => acceptInviteMutation.mutate(invite.inviteToken)}
+              >
+                {isResponding && acceptInviteMutation.isPending ? "Joining…" : "Accept"}
+              </Button>
+              <button
+                type="button"
+                disabled={isResponding}
+                onClick={() => declineInviteMutation.mutate(invite.inviteToken)}
+                className="tap-target flex-1 rounded-[var(--radius-pill)] border border-coral-200 text-sm font-semibold text-coral-600 disabled:opacity-50"
+              >
+                {isResponding && declineInviteMutation.isPending ? "Declining…" : "Decline"}
+              </button>
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  );
+
   if (isLoading) {
     return (
       <div className="mx-auto w-full max-w-sm px-5 pt-8">
@@ -72,6 +141,7 @@ export default function FamilyPage() {
     return (
       <div className="mx-auto flex w-full max-w-sm flex-1 flex-col px-5 pt-8">
         <h1 className="mb-4 text-2xl font-bold">Family</h1>
+        {invitesSection}
         <div className="relative h-48 overflow-hidden rounded-[var(--radius-card)]">
           <PhotoSlot alt="" src={photos.tiles.family} sizes="384px" />
           <div className="photo-scrim absolute inset-0 rounded-[var(--radius-card)]" />
@@ -115,6 +185,8 @@ export default function FamilyPage() {
           </Link>
         )}
       </div>
+
+      {invitesSection}
 
       <div className="space-y-2 pb-6">
         {myGroup.owner && (

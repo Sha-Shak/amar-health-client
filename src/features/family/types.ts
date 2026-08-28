@@ -32,3 +32,13 @@ export type InvitationContext = {
   owner: FamilyMemberUser | null;
   expiresAt: string;
 };
+
+export type MyInvite = {
+  _id: string;
+  inviteToken: string;
+  expiresAt: string;
+  familyGroupId: {
+    _id: string;
+    ownerId: FamilyMemberUser | null;
+  };
+};

@@ -14,6 +14,8 @@ import { useState } from "react";
 
 const BLOOD_GROUPS = ["A+", "A-", "B+", "B-", "O+", "O-", "AB+", "AB-", "unknown"] as const;
 const TOTAL_STEPS = 4;
+// Same shape the backend enforces (patient-auth.validation.ts's phoneSchema).
+const PHONE_REGEX = /^(\+8801|01)[0-9]{9}$/;
 
 export default function ProfileSetupPage() {
   const router = useRouter();
@@ -31,6 +33,11 @@ export default function ProfileSetupPage() {
   const [name, setName] = useState(() => user?.name ?? "");
   const [dob, setDob] = useState(() => user?.dob?.slice(0, 10) ?? "");
   const [gender, setGender] = useState(() => user?.gender ?? "");
+  // Phone is the account's one exclusive contact identifier (unique across all
+  // users, enforced server-side by /patient/me/phone) — required here only when
+  // the account doesn't already have one (e.g. email signup never collected it;
+  // phone signup already has it and this field is skipped entirely).
+  const [phone, setPhone] = useState("");
 
   // Step 2
   const [bloodGroup, setBloodGroup] = useState("");
@@ -62,6 +69,12 @@ export default function ProfileSetupPage() {
         );
         await uploadFile(uploadUrl, compressed);
         avatarUrl = fileKey;
+      }
+      // Phone is set through its own endpoint (uniqueness + "can only be set
+      // once" both live there — see patient-auth.service.ts's setPhone), not
+      // through updateMe, which deliberately excludes phone entirely.
+      if (!user?.phone && phone) {
+        await authApi.setPhone(phone);
       }
       return authApi.updateMe({
         name,
@@ -110,6 +123,16 @@ export default function ProfileSetupPage() {
     if (!name.trim() || !dob) {
       setValidationError("Name and date of birth are required.");
       return;
+    }
+    if (!user?.phone) {
+      if (!phone.trim()) {
+        setValidationError("Phone number is required.");
+        return;
+      }
+      if (!PHONE_REGEX.test(phone.trim())) {
+        setValidationError("Enter a valid phone number (e.g. 01XXXXXXXXX).");
+        return;
+      }
     }
     setValidationError(undefined);
     saveStep1.mutate();
@@ -180,6 +203,17 @@ export default function ProfileSetupPage() {
                 value={dob}
                 onChange={(e) => setDob(e.target.value)}
               />
+              {!user?.phone && (
+                <TextField
+                  label="Phone number"
+                  name="phone"
+                  type="tel"
+                  required
+                  placeholder="01XXXXXXXXX"
+                  value={phone}
+                  onChange={(e) => setPhone(e.target.value)}
+                />
+              )}
               <div className="space-y-1.5">
                 <label htmlFor="gender" className="text-sm font-medium text-ink-700">
                   Gender

@@ -27,6 +27,11 @@ export default function FamilyInvitationPage() {
     onSuccess: () => router.replace("/family"),
   });
 
+  const declineMutation = useMutation({
+    mutationFn: () => familyApi.declineInvitation(token),
+    onSuccess: () => router.replace("/family"),
+  });
+
   return (
     <div className="mx-auto flex w-full max-w-sm flex-1 flex-col justify-center px-6 py-10">
       <div className="glass-panel space-y-5 p-6 text-center">
@@ -56,16 +61,26 @@ export default function FamilyInvitationPage() {
 
             {hasToken ? (
               <>
-                {acceptMutation.isError && (
-                  <p className="text-sm text-coral-600">{errorMessage(acceptMutation.error)}</p>
+                {(acceptMutation.isError || declineMutation.isError) && (
+                  <p className="text-sm text-coral-600">
+                    {errorMessage(acceptMutation.error ?? declineMutation.error)}
+                  </p>
                 )}
                 <Button
                   className="w-full"
-                  disabled={acceptMutation.isPending}
+                  disabled={acceptMutation.isPending || declineMutation.isPending}
                   onClick={() => acceptMutation.mutate()}
                 >
                   {acceptMutation.isPending ? "Joining…" : "Accept invitation"}
                 </Button>
+                <button
+                  type="button"
+                  disabled={acceptMutation.isPending || declineMutation.isPending}
+                  onClick={() => declineMutation.mutate()}
+                  className="tap-target w-full rounded-[var(--radius-pill)] border border-coral-200 py-3 text-sm font-semibold text-coral-600 disabled:opacity-50"
+                >
+                  {declineMutation.isPending ? "Declining…" : "Decline"}
+                </button>
               </>
             ) : (
               <>
