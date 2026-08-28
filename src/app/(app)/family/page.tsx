@@ -146,6 +146,24 @@ export default function FamilyPage() {
         })}
       </div>
 
+      {myGroup.isOwner && myGroup.pendingInvites.length > 0 && (
+        <div className="mb-6">
+          <h2 className="mb-2 text-sm font-semibold text-ink-700">Pending invites</h2>
+          <div className="space-y-2">
+            {myGroup.pendingInvites.map((invite) => (
+              <FamilyMemberRow
+                key={invite._id}
+                name={invite.userId.name ?? "Invited"}
+                avatarUrl={invite.userId.avatarUrl}
+                phone={invite.userId.phone}
+                email={invite.userId.email}
+                badge="Pending"
+              />
+            ))}
+          </div>
+        </div>
+      )}
+
       {(myGroup.isOwner || selfMember) && (
         <button
           type="button"

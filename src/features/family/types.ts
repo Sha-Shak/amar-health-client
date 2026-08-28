@@ -24,6 +24,7 @@ export type MyFamilyGroup = {
   group: FamilyGroup;
   owner: FamilyMemberUser | null;
   members: FamilyMember[];
+  pendingInvites: FamilyMember[];
   isOwner: boolean;
 };
 
