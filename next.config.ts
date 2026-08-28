@@ -13,6 +13,9 @@ const nextConfig: NextConfig = {
       // Google-account avatars — a Google-signup user's avatarUrl points
       // here directly (never proxied through our own backend).
       { protocol: "https", hostname: "lh3.googleusercontent.com" },
+      // Cloudflare R2 public bucket — resolveFileUrl returns these directly
+      // for avatars / vault files once R2 is the configured storage.
+      { protocol: "https", hostname: "**.r2.dev" },
     ],
   },
 };

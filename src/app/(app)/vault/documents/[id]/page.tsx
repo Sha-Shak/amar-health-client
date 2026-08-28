@@ -3,6 +3,9 @@
 import { Button } from "@/components/ui/button";
 import { DoctorAutocomplete } from "@/components/ui/doctor-autocomplete";
 import { TextField } from "@/components/ui/text-field";
+import { useAuth } from "@/components/providers/auth-provider";
+import { prescriptionsApi } from "@/features/prescriptions/api";
+import { PrescriptionView } from "@/features/prescriptions/prescription-view";
 import { vaultApi } from "@/features/vault/api";
 import { errorMessage } from "@/lib/error-message";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -67,8 +70,67 @@ export default function DocumentDetailPage() {
     onError: () => toast.error("Couldn't delete that document"),
   });
 
+  const { user } = useAuth();
+  const rxQuery = useQuery({
+    queryKey: ["patient", "prescription", doc?.prescriptionId],
+    queryFn: () => prescriptionsApi.get(doc!.prescriptionId as string),
+    enabled: Boolean(doc?.prescriptionId),
+  });
+
   if (isLoading || !doc) {
     return <div className="flex flex-1 items-center justify-center text-ink-700">Loading…</div>;
+  }
+
+  // System-generated prescription — render the structured, in-app view instead of
+  // a flat image hero.
+  if (doc.prescriptionId) {
+    return (
+      <div className="mx-auto w-full max-w-md flex-1 space-y-4 px-5 py-6">
+        <button
+          type="button"
+          onClick={() => router.back()}
+          aria-label="Go back"
+          className="tap-target -ml-2 rounded-full text-ink-700"
+        >
+          <ChevronLeft size={22} aria-hidden="true" />
+        </button>
+        {rxQuery.isLoading && <p className="text-sm text-ink-500">Loading prescription…</p>}
+        {rxQuery.isError && (
+          <p className="text-sm text-coral-600">{errorMessage(rxQuery.error)}</p>
+        )}
+        {rxQuery.data && (
+          <PrescriptionView p={rxQuery.data} lang={user?.preferredLanguage ?? "en"} />
+        )}
+        {!confirmingDelete ? (
+          <button
+            type="button"
+            onClick={() => setConfirmingDelete(true)}
+            className="tap-target flex w-full items-center justify-center gap-2 text-sm font-medium text-coral-600"
+          >
+            <Trash2 size={16} aria-hidden="true" />
+            Remove from vault
+          </button>
+        ) : (
+          <div className="glass-panel space-y-3 p-4 text-center">
+            <p className="text-sm font-medium">
+              Remove this prescription from your vault? The record stays with your doctor.
+            </p>
+            <div className="flex gap-3">
+              <Button variant="glass" className="flex-1" onClick={() => setConfirmingDelete(false)}>
+                Cancel
+              </Button>
+              <Button
+                className="flex-1 !bg-coral-600"
+                disabled={deleteMutation.isPending}
+                onClick={() => deleteMutation.mutate()}
+              >
+                {deleteMutation.isPending ? "Removing…" : "Remove"}
+              </Button>
+            </div>
+          </div>
+        )}
+      </div>
+    );
   }
 
   return (

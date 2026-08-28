@@ -363,3 +363,23 @@
     transform: translateY(0);
   }
 }
+
+/* A prescription always renders as a light "paper" document — never dark — even
+   when the patient has dark mode on. Re-declares the tokens tokens.css's
+   [data-theme="dark"] block overrides, back to their light values, scoped to
+   this subtree. */
+.rx-paper {
+  --color-primary-50: #f0fdfa;
+  --color-primary-900: #134e4a;
+  --color-ink-900: #0c1917;
+  --color-ink-700: #3f524f;
+  --color-ink-500: #6b7c79;
+  --surface-color: 255 255 255;
+  --page-bg-from: #f0fdfa;
+  --page-bg-via: #ffffff;
+  --page-bg-to: #ffffff;
+  --shadow-color: 12 25 23;
+  --glass-on-photo-tint: 12 25 23;
+  background: #ffffff;
+  color: var(--color-ink-900);
+}

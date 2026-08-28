@@ -9,6 +9,7 @@ export type VaultDocument = {
   tag?: string;
   doctorName?: string;
   doctorId?: string;
+  prescriptionId?: string; // set on system-generated prescription documents
   placeOfTest?: string;
   note?: string;
   documentDate?: string;
