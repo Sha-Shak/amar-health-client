@@ -1,8 +1,9 @@
 "use client";
 
 import { format } from "date-fns";
-import { BellRing, Download, FileText, Stethoscope } from "lucide-react";
+import { BellRing, ExternalLink, FileText, Printer, Stethoscope } from "lucide-react";
 import Link from "next/link";
+import { useState } from "react";
 import { dosePattern, medDisplayName, plainSig } from "./sig";
 import type { PatientPrescription } from "./types";
 
@@ -26,6 +27,7 @@ export function PrescriptionView({
   p: PatientPrescription;
   lang?: "en" | "bn";
 }) {
+  const [showPdf, setShowPdf] = useState(false);
   const meds = p.medicines ?? [];
   const hasSlotMeds = meds.some(
     (m) => (m.doseSchedule?.morning ?? 0) + (m.doseSchedule?.afternoon ?? 0) + (m.doseSchedule?.night ?? 0) > 0,
@@ -185,15 +187,43 @@ export function PrescriptionView({
       )}
 
       {p.pdfUrl && (
-        <a
-          href={p.pdfUrl}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="flex items-center justify-center gap-2 rounded-full bg-primary-600 py-3 text-sm font-semibold text-white"
-        >
-          <Download size={16} aria-hidden="true" />
-          Download prescription PDF
-        </a>
+        <div className="space-y-2">
+          <div className="flex gap-2">
+            <button
+              type="button"
+              onClick={() => setShowPdf((v) => !v)}
+              className="flex flex-1 items-center justify-center gap-2 rounded-full bg-primary-600 py-3 text-sm font-semibold text-white"
+            >
+              <Printer size={16} aria-hidden="true" />
+              {showPdf ? "Hide print version" : "Print version"}
+            </button>
+            <a
+              href={p.pdfUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Open print version in a new tab"
+              className="flex items-center justify-center rounded-full border border-primary-400/40 px-4 text-primary-700"
+            >
+              <ExternalLink size={16} aria-hidden="true" />
+            </a>
+          </div>
+          {showPdf && (
+            <div className="overflow-hidden rounded-[var(--radius-md)] border border-primary-400/20 bg-white">
+              <iframe
+                src={`${p.pdfUrl}#toolbar=0&navpanes=0`}
+                title="Prescription — print version"
+                className="h-[70vh] w-full"
+              />
+              <p className="px-3 py-2 text-center text-[11px] text-ink-500">
+                Not showing?{" "}
+                <a href={p.pdfUrl} target="_blank" rel="noopener noreferrer" className="font-medium text-primary-700 underline">
+                  Open it in a new tab
+                </a>
+                .
+              </p>
+            </div>
+          )}
+        </div>
       )}
 
       <p className="flex items-center justify-center gap-1.5 text-center text-[11px] text-ink-400">

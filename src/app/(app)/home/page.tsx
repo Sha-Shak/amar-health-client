@@ -69,8 +69,11 @@ export default function HomeDashboardPage() {
     queryFn: () => bloodDonationApi.listRequests({ mine: true }),
   });
 
+  // Distinct from the /bookings page key (["bookings", "list", <tab>]) on purpose —
+  // that one is a useInfiniteQuery, and sharing a key would let this plain
+  // {items,nextCursor} object land in its cache and crash it (no .pages).
   const nextBookingQuery = useQuery({
-    queryKey: ["bookings", "list", "confirmed"],
+    queryKey: ["bookings", "home-next"],
     queryFn: () => bookingApi.listBookings({ status: "confirmed" }),
   });
 
